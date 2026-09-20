@@ -8,6 +8,9 @@
  * Contato direto: link curto do WhatsApp (wa.link) usado nos botões "Falar no
  * WhatsApp" (botão flutuante e rodapé). Aponta para o mesmo número.
  *
+ * Domínio oficial: usado no canonical, sitemap, robots, Open Graph e dados estruturados.
+ * Pode ser sobrescrito por NEXT_PUBLIC_SITE_URL (útil em ambientes de teste).
+ *
  * Cadastur: deixe vazio até a agência ter o registro aprovado. Quando preenchido,
  * o número aparece no rodapé com link para o site oficial de consulta.
  *
@@ -19,6 +22,7 @@ const WHATSAPP_NUMBER = "5594999099386"; // (94) 99909-9386
 const WHATSAPP_CONTACT_URL = "https://wa.link/fj7dxp";
 const INSTAGRAM_URL = "https://www.instagram.com/grgviagens";
 const CADASTUR_NUMBER = "";
+const SITE_URL = "https://grgviagens.com.br";
 
 export const siteConfig = {
   name: "GRG Viagens",
@@ -26,7 +30,7 @@ export const siteConfig = {
   whatsappContactUrl: process.env.NEXT_PUBLIC_WHATSAPP_CONTACT_URL || WHATSAPP_CONTACT_URL,
   instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL || INSTAGRAM_URL,
   cadastur: process.env.NEXT_PUBLIC_CADASTUR || CADASTUR_NUMBER,
-  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, ""),
+  siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/+$/, ""),
   plausibleDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || "",
   umamiId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || "",
   umamiSrc: process.env.NEXT_PUBLIC_UMAMI_SRC || "https://cloud.umami.is/script.js",

@@ -25,7 +25,7 @@ Tudo em [src/config/site.ts](src/config/site.ts). Cada valor também aceita vari
 | WhatsApp (mensagem do planejador) | `5594999099386` | `NEXT_PUBLIC_WHATSAPP_NUMBER` |
 | WhatsApp (botões de contato) | `https://wa.link/fj7dxp` | `NEXT_PUBLIC_WHATSAPP_CONTACT_URL` |
 | Instagram | `https://www.instagram.com/grgviagens` | `NEXT_PUBLIC_INSTAGRAM_URL` |
-| Domínio (Open Graph, sitemap) | `http://localhost:3000` | `NEXT_PUBLIC_SITE_URL` |
+| Domínio (canonical, sitemap, Open Graph) | `https://grgviagens.com.br` | `NEXT_PUBLIC_SITE_URL` |
 | Cadastur | vazio (não aparece) | `NEXT_PUBLIC_CADASTUR` |
 | Analytics Plausible | desligado | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` |
 | Analytics Umami | desligado | `NEXT_PUBLIC_UMAMI_WEBSITE_ID` (+ `NEXT_PUBLIC_UMAMI_SRC`) |
@@ -38,7 +38,7 @@ Sem configuração, **nada é carregado nem enviado**. Ao configurar Plausible o
 
 ## Pendências antes de publicar
 
-1. **Domínio**: defina `NEXT_PUBLIC_SITE_URL` (ex.: `https://www.grgviagens.com.br`).
+1. **Domínio**: já configurado como `https://grgviagens.com.br`. Ao publicar, aponte o DNS do domínio para a hospedagem e ative HTTPS.
 2. **Cadastur**: preencha `NEXT_PUBLIC_CADASTUR` só quando o registro estiver aprovado.
 3. **Depoimentos**: [src/content/testimonials.ts](src/content/testimonials.ts) está vazio e a seção não aparece. Adicione apenas depoimentos reais e autorizados.
 4. **Serviços não publicados**: "Seguro viagem" e "Cruzeiros" só entram quando a GRG confirmar (`services` em [src/content/text.ts](src/content/text.ts)).
