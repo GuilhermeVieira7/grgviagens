@@ -14,11 +14,11 @@ function WhatsAppIcon({ className = "" }: { className?: string }) {
 
 /**
  * Botões fixos:
- *  - WhatsApp (todas as telas), depois da abertura. No celular só aparece ao rolar
- *    para cima, para não cobrir a leitura, e some sobre o planejador.
- *  - "Planejar minha viagem" (só celular/tablet), com a mesma regra, e também some
- *    no encerramento.
- * Ambos somem no rodapé, onde o contato já está.
+ *  - WhatsApp: SEMPRE visível, em todas as páginas e telas, desde o primeiro
+ *    carregamento (já vem no HTML, sem esperar rolagem nem JavaScript).
+ *  - "Planejar minha viagem" (só celular/tablet): aparece depois da abertura, ao
+ *    rolar para cima, e some no planejador, no encerramento e no rodapé, para não
+ *    cobrir campos nem outros botões.
  */
 export function Dock() {
   const [pastHero, setPastHero] = useState(false);
@@ -80,8 +80,6 @@ export function Dock() {
     };
   }, []);
 
-  const inFooter = inView.has("rodape");
-  const waShow = pastHero && !inFooter && (small ? up && !inView.has("planejador") : true);
   const pillShow = small && pastHero && up && inView.size === 0;
 
   return (
@@ -106,14 +104,10 @@ export function Dock() {
         href={siteConfig.whatsappContactUrl}
         target="_blank"
         rel="noopener noreferrer"
-        tabIndex={waShow ? 0 : -1}
-        aria-hidden={!waShow}
         aria-label="Falar com a GRG no WhatsApp"
         data-track="whatsapp_contato"
         data-track-local="botao_flutuante"
-        className={`on-dark flex h-14 w-14 flex-none items-center justify-center rounded-full bg-[#189d5b] text-white shadow-[0_10px_30px_rgb(2_12_40/0.45)] transition-[opacity,transform,background-color] duration-300 hover:bg-[#127a47] ${
-          waShow ? "pointer-events-auto translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-        }`}
+        className={`on-dark flex h-14 w-14 flex-none items-center justify-center rounded-full bg-[#189d5b] text-white shadow-[0_10px_30px_rgb(2_12_40/0.45)] pointer-events-auto transition-colors duration-300 hover:bg-[#127a47]`}
       >
         <WhatsAppIcon className="h-8 w-8" />
       </a>

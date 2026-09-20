@@ -63,7 +63,7 @@ export default async function ServicePage({ params }: Props) {
             </div>
           </div>
           <p className="lead mt-6 max-w-[46rem] text-ink/90">{s.intro}</p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-7 cta-row flex flex-col gap-3 sm:flex-row">
             <a href="#planejador" className="btn btn-royal" data-track="servico_cotar" data-track-local={s.slug}>
               Pedir minha cotação <Arrow />
             </a>

@@ -77,7 +77,7 @@ export default async function GuidePage({ params }: Props) {
         <aside className="on-dark mt-14 rounded-3xl bg-abyss p-8 text-white sm:p-12" aria-label="Fale com a GRG">
           <p className="display text-[clamp(1.75rem,3vw,2.5rem)]">Quer planejar a sua viagem?</p>
           <p className="mt-3 max-w-[32rem] text-white/85">Conte seus planos e a equipe da GRG prepara uma cotação personalizada.</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 cta-row flex flex-col gap-3 sm:flex-row">
             <Link href="/#planejador" className="btn btn-lagoon" data-track="guia_planejar" data-track-local={g.slug}>
               Planejar minha viagem <Arrow />
             </Link>

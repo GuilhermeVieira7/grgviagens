@@ -844,3 +844,14 @@ select.field {
     display: none !important;
   }
 }
+
+/* Em telas pequenas os botões de ação ficam à esquerda e nunca ficam por baixo do
+   botão flutuante do WhatsApp (56 px + 16 px de margem). */
+@media (max-width: 639px) {
+  .cta-row {
+    align-items: flex-start;
+  }
+  .cta-row > * {
+    max-width: calc(100% - 4.5rem);
+  }
+}

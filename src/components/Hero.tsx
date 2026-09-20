@@ -17,7 +17,7 @@ export function Hero() {
     >
       <div className="hero-glow absolute -z-10" aria-hidden="true" />
 
-      <div className="wrap-wide grid min-h-[100svh] items-center gap-x-10 gap-y-8 pb-14 pt-[calc(var(--header-h)+1.25rem)] lg:grid-cols-12 lg:pb-16 lg:pt-[var(--header-h)]">
+      <div className="wrap-wide grid min-h-[100svh] items-center gap-x-10 gap-y-8 pb-28 pt-[calc(var(--header-h)+1.25rem)] sm:pb-24 lg:grid-cols-12 lg:pb-16 lg:pt-[var(--header-h)]">
         <figure className="postcard-wrap order-first mx-auto w-[min(100%,25rem)] sm:w-[min(100%,34rem)] md:w-[min(100%,40rem)] lg:order-none lg:col-span-7 lg:col-start-6 lg:row-start-1 lg:mt-6 lg:mr-[clamp(0rem,2.2vw,3rem)] lg:w-full lg:max-w-[43.75rem] lg:justify-self-end">
           <div className="postcard">
             <div className="postcard-photo">
@@ -60,7 +60,7 @@ export function Hero() {
             experiências inesquecíveis.
           </p>
           <div
-            className="rise mt-8 flex flex-col gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-start xl:flex-row xl:items-center"
+            className="rise cta-row mt-8 flex flex-col gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-start xl:flex-row xl:items-center"
             style={{ ["--d" as string]: "0.4s" }}
           >
             <a id="hero-cta" href="#planejador" data-track="hero_planejar" className="btn btn-lagoon !min-h-14 !px-8 text-[1.0625rem] whitespace-nowrap">

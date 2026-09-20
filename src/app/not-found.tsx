@@ -20,7 +20,7 @@ export default function NotFound() {
           Não encontramos o endereço que você procurou. Volte ao início, escolha um destino ou conte para a GRG a viagem
           que você quer fazer.
         </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-8 cta-row flex flex-col gap-3 sm:flex-row">
           <Link href="/" className="btn btn-royal">
             Voltar ao início <Arrow />
           </Link>

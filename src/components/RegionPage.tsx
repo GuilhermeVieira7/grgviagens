@@ -30,7 +30,7 @@ export function RegionPage({ path, crumb, eyebrow, h1, intro, places, points, fa
           <p className="eyebrow mt-6 text-royal">{eyebrow}</p>
           <h1 className="display mt-4 max-w-[22ch] text-[clamp(2.25rem,1rem+4.6vw,4.5rem)] text-abyss">{h1}</h1>
           <p className="lead mt-6 max-w-[46rem] text-ink/90">{intro}</p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-7 cta-row flex flex-col gap-3 sm:flex-row">
             <a href="#planejador" className="btn btn-royal" data-track="regiao_cotar" data-track-local={path}>
               Pedir minha cotação <Arrow />
             </a>

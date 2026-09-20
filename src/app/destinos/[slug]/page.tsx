@@ -60,7 +60,7 @@ export default async function DestinationPage({ params }: Props) {
             </div>
             <div className="lg:col-span-5">
               <p className="lead text-ink/90">{d.intro}</p>
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 cta-row flex flex-col gap-3 sm:flex-row">
                 <a href="#planejador" className="btn btn-royal" data-track="destino_cotar" data-track-destino={d.city}>
                   Quero cotar {d.city} <Arrow />
                 </a>
@@ -91,7 +91,7 @@ export default async function DestinationPage({ params }: Props) {
                 className="object-cover"
               />
             </div>
-            <figcaption className="mt-3 text-sm text-ink/70">
+            <figcaption className="mt-3 text-sm text-ink/70 max-sm:pr-[4.5rem]">
               Foto:{" "}
               <a href={credit.source} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-royal">
                 {credit.author}
