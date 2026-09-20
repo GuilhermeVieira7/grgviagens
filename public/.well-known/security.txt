@@ -1,0 +1,4 @@
+Contact: https://wa.link/fj7dxp
+Expires: 2027-09-20T00:00:00.000Z
+Preferred-Languages: pt-BR
+Canonical: https://grgviagens.com.br/.well-known/security.txt

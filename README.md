@@ -63,6 +63,16 @@ O que precisa ser feito **fora do código** (a parte que mais pesa para aparecer
 
 Expectativa realista: termos genéricos como "viagens" ou "hotéis" são disputados por grandes sites do país inteiro. O caminho é ganhar posição primeiro em buscas específicas e locais (nome da agência, "agência de viagens em <sua cidade>", "pacote para Gramado", "viajar com crianças") e crescer a partir delas. Resultados de SEO levam semanas a meses depois da indexação.
 
+## Segurança
+
+- **Cabeçalhos de segurança** em todas as rotas (`next.config.ts`): Content-Security-Policy (só o próprio site carrega scripts, estilos, fontes e imagens; Plausible/Umami já liberados caso sejam ativados), X-Frame-Options e `frame-ancestors 'none'` (ninguém embute o site), X-Content-Type-Options, Referrer-Policy, Permissions-Policy (câmera, microfone, localização etc. desativados) e Cross-Origin-Opener-Policy. O HSTS (HTTPS obrigatório) já é enviado pela Vercel.
+- `X-Powered-By` removido (não anuncia a tecnologia do servidor).
+- O site não tem back-end, banco de dados nem coleta de dados: o formulário só monta a mensagem no navegador e abre o WhatsApp.
+- Links externos usam `rel="noopener noreferrer"`.
+- `public/.well-known/security.txt`: canal para quem encontrar uma falha avisar a GRG.
+- `.github/dependabot.yml`: atualizações semanais de dependências (o GitHub abre um PR; revise e faça o merge).
+- Ao ativar um novo serviço externo (mapa, chat, outro analytics), inclua o domínio dele no CSP em `next.config.ts`, senão o navegador bloqueia.
+
 ## Pendências antes de publicar
 
 1. **Domínio**: `https://grgviagens.com.br` já é o padrão do site. Falta só o registro DNS do `www` (veja a seção SEO).
