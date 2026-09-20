@@ -18,7 +18,7 @@ export function agencyLd() {
     logo: abs("/brand/logo-512.png"),
     image: abs("/images/og.jpg"),
     description:
-      "Agência de viagens: passagens aéreas, hospedagem, pacotes, passeios, ingressos, aluguel de veículos, assessoria para passaporte e check-in assistido.",
+      "Agência de viagens e turismo: passagens aéreas, hotéis e hospedagem, pacotes de viagem, passeios, ingressos, aluguel de veículos, assessoria para passaporte e check-in assistido. Viagens nacionais e internacionais, viagem em família, lua de mel e primeira viagem.",
     telephone: `+${siteConfig.whatsappNumber}`,
     sameAs: [siteConfig.instagramUrl],
     contactPoint: {
@@ -28,7 +28,7 @@ export function agencyLd() {
       availableLanguage: ["pt-BR"],
       url: siteConfig.whatsappContactUrl,
     },
-    knowsAbout: ["passagens aéreas", "hospedagem", "pacotes de viagem", "passeios", "aluguel de veículos"],
+    knowsAbout: ["agência de viagens", "turismo", "viagens nacionais", "viagens internacionais", "passagens aéreas", "hotéis e hospedagem", "pacotes de viagem", "passeios e ingressos", "aluguel de veículos", "passaporte", "viagem em família", "lua de mel", "primeira viagem"],
   };
 }
 

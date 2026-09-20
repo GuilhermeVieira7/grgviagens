@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: `Planeje sua viagem para ${d.city}, ${d.country}. ${d.description} Cotação de passagens, hotel e passeios com a GRG Viagens.`,
+    keywords: [`viagem para ${d.city}`, `pacotes para ${d.city}`, `passagens para ${d.city}`, `hotéis em ${d.city}`, `turismo em ${d.city}`, `o que fazer em ${d.city}`, `${d.city} ${d.country}`, "agência de viagens"],
     alternates: { canonical: `/destinos/${d.slug}` },
     openGraph: {
       type: "article",

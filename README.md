@@ -14,7 +14,8 @@ npm run lint
 - `/` página inicial (abertura com cartão-postal, destinos com filtros, serviços, galeria, planejador, como funciona, Instagram, institucional, guias, dúvidas, encerramento)
 - `/servicos` e `/servicos/[slug]`: uma página por serviço (passagens aéreas, hospedagem, pacotes, passeios e ingressos, aluguel de veículos, assessoria para passaporte, check-in)
 - `/destinos` e `/destinos/[slug]`: guia de cada destino (Gramado, Maceió, Cancún, Paris, Lisboa, Buenos Aires) com o planejador já preenchido
-- `/dicas` e `/dicas/[slug]`: guias de viagem completos (viajar em família, pacotes, passagens, hospedagem, primeira viagem de avião, durante o voo)
+- `/viagens-nacionais` e `/viagens-internacionais`: páginas de turismo no Brasil e no exterior
+- `/dicas` e `/dicas/[slug]`: 11 guias de viagem (como planejar, agência vale a pena?, primeira viagem internacional, lua de mel, escolher destino de férias, viajar em família, pacotes, passagens, hospedagem, primeira viagem de avião, durante o voo)
 - `/sitemap.xml`, `/robots.txt` e página 404 (sem indexar) gerados automaticamente
 
 ## Configuração
@@ -47,6 +48,8 @@ Tudo o que o código pode fazer por SEO já está feito e é verificado automati
 - **Conteúdo indexável** para as buscas principais: uma página própria para cada serviço, destino e guia (agência de viagens, passagens aéreas, hotéis e hospedagem, pacotes de viagem, passeios, aluguel de carro, viajar em família).
 - **Links internos** entre home, serviços, destinos e guias; imagens com texto alternativo; `lang="pt-BR"`.
 - **`www.grgviagens.com.br` redireciona (308) para `grgviagens.com.br`**, mantendo o caminho. Configurado em `next.config.ts`.
+- **Prévia ao compartilhar o link** (WhatsApp, Facebook, Instagram, LinkedIn): imagem 1200×630 com a logo da GRG em destaque (`public/images/og.jpg`, 79 KB) e título/descrição do site. Ícone para iPhone em `src/app/apple-icon.png`. Se uma prévia antiga aparecer, é cache: o WhatsApp guarda por um tempo; para forçar, compartilhe o link com `?v=2` no final.
+- **Palavras e sinônimos de busca** (viagem, viagens, viajar, turismo, agência de viagens, pacotes, destinos, primeira viagem, lua de mel, férias…) estão no texto visível, nos títulos, nas descrições, nos guias e nas páginas de viagens nacionais/internacionais.
 - Desempenho: Core Web Vitals no verde (CLS 0, LCP real ~0,4 s); Lighthouse SEO 100.
 
 O que precisa ser feito **fora do código** (a parte que mais pesa para aparecer bem no Google):

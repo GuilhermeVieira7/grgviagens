@@ -50,6 +50,8 @@ export const navLinks = [
 
 export const footerLinks = [
   { label: "Destinos", href: "/destinos" },
+  { label: "Viagens nacionais", href: "/viagens-nacionais" },
+  { label: "Viagens internacionais", href: "/viagens-internacionais" },
   { label: "Serviços", href: "/servicos" },
   { label: "Galeria", href: "/#galeria" },
   { label: "Planejar minha viagem", href: "/#planejador" },

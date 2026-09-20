@@ -22,9 +22,9 @@ const figtree = Figtree({
   display: "swap",
 });
 
-const title = "GRG Viagens: agência de viagens, passagens, hotéis e pacotes";
+const title = "GRG Viagens: agência de viagens e turismo, pacotes e passagens";
 const description =
-  "Agência de viagens com atendimento próximo: passagens aéreas, hotéis, pacotes, passeios, ingressos e aluguel de carro. Peça sua cotação personalizada pelo WhatsApp.";
+  "Agência de viagens e turismo: passagens aéreas, hotéis, pacotes de viagem, passeios, ingressos e aluguel de carro. Peça sua cotação personalizada pelo WhatsApp.";
 
 export const metadata: Metadata = {
   // Domínio oficial em src/config/site.ts (ou NEXT_PUBLIC_SITE_URL)
@@ -33,15 +33,18 @@ export const metadata: Metadata = {
   description,
   applicationName: "GRG Viagens",
   keywords: [
-    "agência de viagens",
-    "viagens",
-    "viajar",
-    "viajar em família",
-    "hotéis",
-    "passeios",
-    "pacotes de viagem",
-    "passagens aéreas",
-    "aluguel de carro",
+    // agência e serviços
+    "agência de viagens", "agência de viagem", "agência de turismo", "agência de viagens e turismo", "consultoria de viagens", "planejamento de viagem",
+    // viagens e turismo
+    "viagens", "viagem", "viajar", "turismo", "turismo nacional", "turismo internacional", "viagens nacionais", "viagens internacionais", "roteiros de viagem",
+    // perfis
+    "primeira viagem", "primeira viagem de avião", "primeira viagem internacional", "viajar em família", "viagem com crianças", "viagem em casal", "lua de mel", "viagem romântica", "férias", "feriado prolongado",
+    // destinos e pacotes
+    "destinos", "destinos nacionais", "destinos internacionais", "pacotes", "pacotes de viagem", "pacotes turísticos", "pacote personalizado", "pacote para Gramado", "pacote para Maceió", "pacote para Cancún", "pacote para Paris", "pacote para Lisboa",
+    // passagens, hospedagem, passeios
+    "passagens aéreas", "passagem aérea", "passagens", "voos", "hotéis", "hotel", "hospedagem", "resorts", "passeios", "ingressos", "atrações turísticas",
+    // outros serviços
+    "aluguel de carro", "locação de veículos", "passaporte", "assessoria de passaporte", "check-in", "cotação de viagem", "orçamento de viagem",
     "GRG Viagens",
   ],
   authors: [{ name: "GRG Viagens" }],

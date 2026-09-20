@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: g.description,
+    keywords: [title, "dicas de viagem", "guia de viagem", "viajar", "viagens", "agência de viagens"],
     alternates: { canonical: `/dicas/${g.slug}` },
     openGraph: {
       type: "article",

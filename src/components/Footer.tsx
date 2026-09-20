@@ -73,7 +73,7 @@ export function Footer() {
           </ul>
           <p className="eyebrow mt-8 text-lagoon">Guias de viagem</p>
           <ul className="mt-4 space-y-1">
-            {guides.map((g) => (
+            {guides.filter((g) => g.featured).map((g) => (
               <li key={g.slug}>
                 <Link prefetch={false}
                   href={`/dicas/${g.slug}`}
@@ -116,6 +116,14 @@ export function Footer() {
         </details>
       </div>
 
+      <div className="border-t border-white/15">
+        <p className="wrap-wide max-w-[64rem] py-8 text-sm leading-relaxed text-white/65">
+          A GRG Viagens é uma agência de viagens e turismo que ajuda você a planejar viagens nacionais e internacionais:
+          passagens aéreas, hotéis e hospedagem, pacotes de viagem, passeios, ingressos, aluguel de carro e assessoria
+          para passaporte. Para férias em família, lua de mel, primeira viagem ou feriado prolongado, conte seus planos e
+          receba uma cotação personalizada.
+        </p>
+      </div>
       <div className="border-t border-white/15">
         <p className="wrap-wide py-6 text-sm text-white/70">
           © <Year /> {siteConfig.name}. Todos os direitos reservados.

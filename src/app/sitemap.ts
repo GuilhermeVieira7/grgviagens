@@ -13,6 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...servicePages.map((s) => ({ url: `${base}/servicos/${s.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),
     { url: `${base}/destinos`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     ...destinations.map((d) => ({ url: `${base}/destinos/${d.slug}`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),
+    { url: `${base}/viagens-nacionais`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${base}/viagens-internacionais`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/dicas`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     ...guides.map((g) => ({ url: `${base}/dicas/${g.slug}`, lastModified: now, changeFrequency: "yearly" as const, priority: 0.6 })),
   ];

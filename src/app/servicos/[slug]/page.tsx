@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: s.metaTitle,
     description: s.description,
+    keywords: [s.name, s.metaTitle, "agência de viagens", "viagens", "turismo", "cotação de viagem"],
     alternates: { canonical: path },
     openGraph: {
       type: "website",
