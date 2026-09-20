@@ -1,4 +1,6 @@
 import { services } from "@/content/text";
+import Link from "next/link";
+import { servicePathByIcon } from "@/content/services";
 import { Arrow } from "./Arrow";
 import { Reveal } from "./Reveal";
 import { ServiceIcon } from "./ServiceIcon";
@@ -31,7 +33,14 @@ export function Services() {
                   <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-lagoon/40 text-lagoon transition-colors group-hover:bg-lagoon group-hover:text-abyss">
                     <ServiceIcon name={s.key} className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-6 text-xl font-bold leading-snug">{s.title}</h3>
+                  <h3 className="mt-6 text-xl font-bold leading-snug">
+                    <Link
+                      href={`/servicos/${servicePathByIcon[s.key]}`}
+                      className="inline-flex min-h-11 items-center underline-offset-4 hover:text-lagoon hover:underline"
+                    >
+                      {s.title}
+                    </Link>
+                  </h3>
                   <p className="mt-2 text-[1.0625rem] leading-relaxed text-white/80">{s.text}</p>
                 </article>
               </Reveal>

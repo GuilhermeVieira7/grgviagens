@@ -19,7 +19,7 @@ export function Tips() {
         <div className="lg:col-span-8">
           <Accordion
             variant="tips"
-            items={guides.map((g) => ({
+            items={guides.filter((g) => g.featured).map((g) => ({
               id: g.slug,
               title: g.title,
               content: (
@@ -49,6 +49,9 @@ export function Tips() {
               ),
             }))}
           />
+          <Link href="/dicas" className="mt-8 inline-flex min-h-11 items-center gap-2 font-bold text-royal underline-offset-4 hover:underline">
+            Ver todos os guias de viagem <Arrow />
+          </Link>
         </div>
       </div>
     </section>

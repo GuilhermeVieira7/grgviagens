@@ -3,11 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Arrow } from "@/components/Arrow";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { JsonLd } from "@/components/JsonLd";
 import { Planner } from "@/components/Planner";
 import { siteConfig } from "@/config/site";
 import { services } from "@/content/text";
 import { destinationLabel, destinations, placeBySlug } from "@/content/places";
 import { photos } from "@/content/photos";
+import { abs, destinationLd } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -19,14 +22,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const d = placeBySlug(slug);
   if (!d) return {};
-  const title = `${d.city}, ${d.country}: guia e cotação`;
+  const title = `Viagem para ${d.city}: guia, dicas e cotação`;
   return {
     title,
-    description: `${d.intro} Peça sua cotação personalizada para ${d.city} pela GRG Viagens.`,
+    description: `Planeje sua viagem para ${d.city}, ${d.country}. ${d.description} Cotação de passagens, hotel e passeios com a GRG Viagens.`,
     alternates: { canonical: `/destinos/${d.slug}` },
     openGraph: {
       type: "article",
+      locale: "pt_BR",
+      siteName: "GRG Viagens",
+      url: abs(`/destinos/${d.slug}`),
       title: `${title} | GRG Viagens`,
+      description: `Guia de viagem para ${d.city}, ${d.country}, com o que costuma atrair e cotação personalizada.`,
       images: [{ url: d.wide.src, width: d.wide.width, height: d.wide.height, alt: d.alt }],
     },
   };
@@ -43,9 +50,7 @@ export default async function DestinationPage({ params }: Props) {
     <main id="conteudo">
       <article className="bg-paper pt-[calc(var(--header-h)+2rem)]">
         <div className="wrap-wide pb-14 lg:pb-20">
-          <Link href="/#destinos" className="inline-flex min-h-11 items-center font-semibold text-royal underline-offset-4 hover:underline">
-            ← Todos os destinos
-          </Link>
+          <Breadcrumbs items={[{ name: "Destinos", path: "/destinos" }, { name: d.city, path: `/destinos/${d.slug}` }]} />
 
           <div className="mt-6 grid gap-8 lg:grid-cols-12 lg:items-end lg:gap-14">
             <div className="lg:col-span-7">
@@ -172,6 +177,7 @@ export default async function DestinationPage({ params }: Props) {
       </article>
 
       <Planner defaultDestination={destinationLabel(d)} />
+      <JsonLd data={destinationLd({ name: `${d.city}, ${d.country}`, description: d.intro, path: `/destinos/${d.slug}`, image: d.wide.src, country: d.country })} />
     </main>
   );
 }

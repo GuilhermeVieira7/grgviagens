@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Arrow } from "@/components/Arrow";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/config/site";
 import { guideBySlug, guides } from "@/content/guides";
+import { abs, articleLd } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -20,7 +23,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description: g.description,
     alternates: { canonical: `/dicas/${g.slug}` },
-    openGraph: { type: "article", title: `${title} | GRG Viagens`, description: g.description },
+    openGraph: {
+      type: "article",
+      locale: "pt_BR",
+      siteName: "GRG Viagens",
+      url: abs(`/dicas/${g.slug}`),
+      title: `${title} | GRG Viagens`,
+      description: g.description,
+      images: [{ url: "/images/og.jpg", width: 1200, height: 630, alt: "GRG Viagens: agência de viagens" }],
+    },
   };
 }
 
@@ -33,9 +44,7 @@ export default async function GuidePage({ params }: Props) {
   return (
     <main id="conteudo" className="bg-white pt-[calc(var(--header-h)+2rem)]">
       <article className="wrap pb-20 lg:pb-28">
-        <Link href="/#dicas" className="inline-flex min-h-11 items-center font-semibold text-royal underline-offset-4 hover:underline">
-          ← Todos os guias
-        </Link>
+        <Breadcrumbs items={[{ name: "Guias de viagem", path: "/dicas" }, { name: g.title.replace(/\.$/, ""), path: `/dicas/${g.slug}` }]} />
         <p className="eyebrow mt-6 text-royal">Guia de viagem</p>
         <h1 className="display mt-5 max-w-[20ch] text-[clamp(2.25rem,1rem+4.6vw,4.5rem)] text-abyss">{g.title}</h1>
         <p className="lead mt-6 max-w-[40rem] text-ink/90">{g.intro}</p>
@@ -101,6 +110,7 @@ export default async function GuidePage({ params }: Props) {
           </ul>
         </nav>
       </article>
+      <JsonLd data={articleLd({ title: g.title.replace(/\.$/, ""), description: g.description, path: `/dicas/${g.slug}` })} />
     </main>
   );
 }

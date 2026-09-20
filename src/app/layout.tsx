@@ -4,7 +4,9 @@ import { Analytics } from "@/components/Analytics";
 import { Dock } from "@/components/Dock";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { JsonLd } from "@/components/JsonLd";
 import { siteConfig } from "@/config/site";
+import { agencyLd, websiteLd } from "@/lib/seo";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -20,21 +22,44 @@ const figtree = Figtree({
   display: "swap",
 });
 
-const title = "GRG Viagens | Passagens, hospedagem e pacotes de viagem";
+const title = "GRG Viagens: agência de viagens, passagens, hotéis e pacotes";
 const description =
-  "O mundo é grande demais para ficar nos planos. Conte para a GRG o que você está planejando e receba uma cotação personalizada de passagens, hospedagem e pacotes.";
+  "Agência de viagens com atendimento próximo: passagens aéreas, hotéis, pacotes, passeios, ingressos e aluguel de carro. Peça sua cotação personalizada pelo WhatsApp.";
 
 export const metadata: Metadata = {
-  // Defina NEXT_PUBLIC_SITE_URL com o domínio oficial para links absolutos de compartilhamento
+  // Domínio oficial em src/config/site.ts (ou NEXT_PUBLIC_SITE_URL)
   metadataBase: new URL(siteConfig.siteUrl),
   title: { default: title, template: "%s | GRG Viagens" },
   description,
   applicationName: "GRG Viagens",
+  keywords: [
+    "agência de viagens",
+    "viagens",
+    "viajar",
+    "viajar em família",
+    "hotéis",
+    "passeios",
+    "pacotes de viagem",
+    "passagens aéreas",
+    "aluguel de carro",
+    "GRG Viagens",
+  ],
+  authors: [{ name: "GRG Viagens" }],
+  creator: "GRG Viagens",
+  publisher: "GRG Viagens",
+  formatDetection: { telephone: false },
   alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  ...(siteConfig.googleVerification ? { verification: { google: siteConfig.googleVerification } } : {}),
   openGraph: {
     type: "website",
     locale: "pt_BR",
     siteName: "GRG Viagens",
+    url: siteConfig.siteUrl,
     title,
     description,
     images: [
@@ -46,25 +71,13 @@ export const metadata: Metadata = {
       },
     ],
   },
-  twitter: { card: "summary_large_image", title, description },
+  twitter: { card: "summary_large_image", title, description, images: ["/images/og.jpg"] },
 };
 
 export const viewport: Viewport = {
   themeColor: "#06265e",
   width: "device-width",
   initialScale: 1,
-};
-
-/** Dados estruturados da agência: só informações confirmadas (sem endereço, sem avaliações). */
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "TravelAgency",
-  name: siteConfig.name,
-  url: siteConfig.siteUrl,
-  telephone: `+${siteConfig.whatsappNumber}`,
-  areaServed: "BR",
-  sameAs: [siteConfig.instagramUrl],
-  description,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -81,7 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <Dock />
         <Analytics />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <JsonLd data={[agencyLd(), websiteLd()]} />
       </body>
     </html>
   );

@@ -113,6 +113,26 @@ export const faq = [
     a: "Pelo atendimento, conforme a viagem e as condições disponíveis. Conte seus planos no formulário e a GRG responde com as opções.",
   },
   {
+    q: "O que a GRG Viagens oferece?",
+    a: "A GRG é uma agência de viagens com atendimento próximo. Trabalha com passagens aéreas, hospedagem, pacotes personalizados, passeios, ingressos, aluguel de veículos, assessoria para passaporte e check-in assistido.",
+  },
+  {
+    q: "Como funciona a cotação de pacotes de viagem?",
+    a: "Você conta o destino, as datas e o seu estilo de viagem no planejador. A equipe pesquisa as possibilidades, apresenta as opções com valores e condições e, depois da confirmação, orienta você para o embarque.",
+  },
+  {
+    q: "A GRG ajuda a planejar viagem em família, com crianças?",
+    a: "Sim. No planejador você informa quantos adultos e crianças vão, com a idade de cada criança, e a equipe considera isso ao preparar a cotação.",
+  },
+  {
+    q: "Vocês fazem reserva de hotel e pedem passeios e ingressos?",
+    a: "Sim. Hospedagem, passeios e ingressos fazem parte do atendimento e podem ser pedidos junto com a viagem ou separadamente.",
+  },
+  {
+    q: "A GRG faz aluguel de carro?",
+    a: "Sim. O aluguel de veículos faz parte do atendimento e pode ser solicitado junto com passagens e hospedagem.",
+  },
+  {
     q: "A GRG emite passaporte?",
     a: "A agência oferece assessoria no processo de emissão. A emissão do documento é responsabilidade do órgão competente.",
   },

@@ -11,6 +11,9 @@
  * Domínio oficial: usado no canonical, sitemap, robots, Open Graph e dados estruturados.
  * Pode ser sobrescrito por NEXT_PUBLIC_SITE_URL (útil em ambientes de teste).
  *
+ * Google Search Console: cole o código de verificação em NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+ * (Configurações > Propriedade > Método de tag HTML). Sem ele, nada é emitido.
+ *
  * Cadastur: deixe vazio até a agência ter o registro aprovado. Quando preenchido,
  * o número aparece no rodapé com link para o site oficial de consulta.
  *
@@ -31,6 +34,7 @@ export const siteConfig = {
   instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL || INSTAGRAM_URL,
   cadastur: process.env.NEXT_PUBLIC_CADASTUR || CADASTUR_NUMBER,
   siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/+$/, ""),
+  googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
   plausibleDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || "",
   umamiId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || "",
   umamiSrc: process.env.NEXT_PUBLIC_UMAMI_SRC || "https://cloud.umami.is/script.js",
@@ -45,12 +49,12 @@ export const navLinks = [
 ];
 
 export const footerLinks = [
-  { label: "Destinos", href: "/#destinos" },
-  { label: "Serviços", href: "/#servicos" },
+  { label: "Destinos", href: "/destinos" },
+  { label: "Serviços", href: "/servicos" },
   { label: "Galeria", href: "/#galeria" },
   { label: "Planejar minha viagem", href: "/#planejador" },
   { label: "Como funciona", href: "/#como-funciona" },
   { label: "Sobre a GRG", href: "/#sobre" },
-  { label: "Guias de viagem", href: "/#dicas" },
+  { label: "Guias de viagem", href: "/dicas" },
   { label: "Dúvidas frequentes", href: "/#duvidas" },
 ];

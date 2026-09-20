@@ -81,7 +81,7 @@ export function Header() {
         }`}
       >
         <div className="wrap-wide flex h-full items-center justify-between">
-          <Link prefetch={false} href="/" className="flex-none rounded-full" aria-label="GRG Viagens, voltar ao início">
+          <Link prefetch={false} href="/" className="flex-none rounded-full" aria-label="GRG Viagens, agência de viagens: voltar ao início">
             <Image
               src="/brand/logo-256.png"
               alt=""
