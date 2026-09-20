@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { Analytics } from "@/components/Analytics";
 import { Dock } from "@/components/Dock";
 import { Footer } from "@/components/Footer";
@@ -97,6 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <Dock />
         <Analytics />
+        <VercelAnalytics />
         <JsonLd data={[agencyLd(), websiteLd()]} />
       </body>
     </html>
