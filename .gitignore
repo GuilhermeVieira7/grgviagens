@@ -13,3 +13,6 @@ next-env.d.ts
 # Artes de referência dos posts (não usadas pelo site); só a logo original fica versionada
 fotos/*
 !fotos/logo.png
+
+# Estado local de sessão de ferramentas de IA
+.claude/

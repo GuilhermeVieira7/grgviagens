@@ -356,6 +356,47 @@ body {
   font-size: 0.9375rem;
   font-weight: 600;
 }
+.combo-wrap {
+  position: relative;
+}
+.combo-list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  max-height: 16.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #fff;
+  border: 1.5px solid var(--color-mist);
+  border-radius: 16px;
+  padding: 0.5rem;
+  box-shadow: 0 20px 45px -12px rgb(1 10 38 / 0.28);
+}
+.combo-group {
+  padding: 0.6rem 0.75rem 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5d6f8a;
+}
+.combo-group:not(:first-child) {
+  margin-top: 0.15rem;
+  border-top: 1px solid var(--color-mist);
+}
+.combo-option {
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  font-weight: 500;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+.combo-option.is-active {
+  background: var(--color-royal);
+  color: #fff;
+}
 input[type="date"].field {
   min-width: 0;
   appearance: none;

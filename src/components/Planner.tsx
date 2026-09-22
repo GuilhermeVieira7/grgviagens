@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import { destinationLabels } from "@/content/places";
+import { destinationOptions, originOptions } from "@/content/locations";
 import { track } from "@/lib/analytics";
 import { DESTINATION_EVENT } from "@/lib/planner-bus";
 import {
@@ -15,6 +15,7 @@ import {
   type TripRequest,
 } from "@/lib/whatsapp";
 import { Arrow } from "./Arrow";
+import { Combobox } from "./Combobox";
 
 const noopSubscribe = () => () => {};
 const toInt = (s: string) => (s.trim() === "" ? NaN : Number(s));
@@ -390,41 +391,33 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                     </Field>
                   </div>
                   <Field id="f-origin" label="Cidade ou aeroporto de origem" error={errors.origin}>
-                    <input
-                      ref={originRef}
+                    <Combobox
+                      inputRef={originRef}
                       id="f-origin"
-                      className="field"
-                      type="text"
                       autoComplete="address-level2"
                       placeholder="De onde você vai sair?"
                       value={origin}
-                      onChange={(e) => setOrigin(e.target.value)}
-                      aria-invalid={invalid("origin")}
-                      aria-describedby={describe("origin", "f-origin")}
-                      aria-required="true"
+                      onChange={setOrigin}
+                      options={originOptions}
+                      ariaInvalid={invalid("origin")}
+                      ariaDescribedBy={describe("origin", "f-origin")}
+                      ariaRequired
                     />
                   </Field>
                   <div>
                     <Field id="f-destination" label="Destino desejado" error={errors.destination}>
-                      <input
+                      <Combobox
                         id="f-destination"
-                        className="field"
-                        type="text"
-                        list={`${uid}-destinos`}
                         placeholder="Para onde quer ir?"
                         value={undecidedDest ? "" : destination}
                         disabled={undecidedDest}
-                        onChange={(e) => setDestination(e.target.value)}
-                        aria-invalid={invalid("destination")}
-                        aria-describedby={describe("destination", "f-destination")}
-                        aria-required={!undecidedDest}
+                        onChange={setDestination}
+                        options={destinationOptions}
+                        ariaInvalid={invalid("destination")}
+                        ariaDescribedBy={describe("destination", "f-destination")}
+                        ariaRequired={!undecidedDest}
                       />
                     </Field>
-                    <datalist id={`${uid}-destinos`}>
-                      {destinationLabels.map((n) => (
-                        <option key={n} value={n} />
-                      ))}
-                    </datalist>
                     <label className="check mt-1">
                       <input
                         type="checkbox"
