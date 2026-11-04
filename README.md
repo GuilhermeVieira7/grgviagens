@@ -11,7 +11,7 @@ npm run lint
 
 ## Páginas
 
-- `/` página inicial (abertura com cartão-postal, destinos com filtros, serviços, galeria, planejador, como funciona, Instagram, institucional, guias, dúvidas, encerramento)
+- `/` página inicial, na ordem de decisão: abertura imersiva (foto em tela cheia), faixa de benefícios, vitrine "Qual vai ser o seu próximo destino?", institucional ("Você escolhe o destino. A gente ajuda com o caminho."), pedido de cotação, serviços, como funciona (3 passos), dúvidas, chamada final e rodapé institucional
 - `/servicos` e `/servicos/[slug]`: uma página por serviço (passagens aéreas, hospedagem, pacotes, passeios e ingressos, aluguel de veículos, assessoria para passaporte, check-in)
 - `/destinos` e `/destinos/[slug]`: guia de cada destino (Gramado, Maceió, Cancún, Paris, Lisboa, Buenos Aires) com o planejador já preenchido
 - `/viagens-nacionais` e `/viagens-internacionais`: páginas de turismo no Brasil e no exterior
@@ -28,16 +28,29 @@ Tudo em [src/config/site.ts](src/config/site.ts). Cada valor também aceita vari
 | WhatsApp (botões de contato) | `https://wa.link/fj7dxp` | `NEXT_PUBLIC_WHATSAPP_CONTACT_URL` |
 | Instagram | `https://www.instagram.com/grgviagens` | `NEXT_PUBLIC_INSTAGRAM_URL` |
 | Domínio (canonical, sitemap, Open Graph) | `https://grgviagens.com.br` | `NEXT_PUBLIC_SITE_URL` |
-| Cadastur | vazio (não aparece) | `NEXT_PUBLIC_CADASTUR` |
+| Cadastur | `69.217.621/0001-28` (confirmado pela GRG em nov/2026) | `NEXT_PUBLIC_CADASTUR` |
+| CNPJ | `69.217.621/0001-28` (confirmado) | — |
+| Razão social, endereço, e-mail, horário | vazios (não aparecem) | — |
 | Google Search Console (tag HTML) | vazio | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` |
 | Analytics Plausible | desligado | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` |
 | Analytics Umami | desligado | `NEXT_PUBLIC_UMAMI_WEBSITE_ID` (+ `NEXT_PUBLIC_UMAMI_SRC`) |
 
 Se o número do WhatsApp ficar vazio ou inválido, o planejador não gera link: o visitante vê e copia a mensagem.
 
+> **Contatos:** o formulário abre `wa.me/5594999099386`; os botões "Conversar no WhatsApp" usam o link curto `wa.link/fj7dxp`. Os dois devem apontar para o mesmo número, mas o destino do link curto não pôde ser conferido automaticamente. Confirme abrindo-o; se for o mesmo número, dá para trocar por `https://wa.me/5594999099386` e eliminar o intermediário.
+
+## Vitrine de ofertas
+
+Fonte única: [src/content/offers.ts](src/content/offers.ts). Dois tipos de item:
+
+- `cotacao`: destino em destaque, sem preço ("Solicitar cotação"). É o que está publicado, porque não há ofertas vigentes confirmadas.
+- `oferta`: pacote com dados **confirmados pela GRG**: saída, período, noites, serviços incluídos, preço por pessoa (opcional) e condições. Botão "Quero esse pacote". Com `validUntil`, a oferta sai do site sozinha depois da data.
+
+O arquivo tem um modelo comentado. Nunca reaproveite valores de artes antigas. Ao escolher um item, o formulário recebe o destino (e, nas ofertas, a cidade de saída) e a mensagem do WhatsApp leva a referência e os dados do pacote.
+
 ## Analytics (sem cookies, opcional)
 
-Sem configuração, **nada é carregado nem enviado**. Ao configurar Plausible ou Umami, o site registra: `hero_planejar`, `header_planejar`, `destino_quero_conhecer` (com o destino), `destino_cotar`, `filtro_destino`, `form_submit_valido`, `whatsapp_abrir`, `mensagem_copiada`, `whatsapp_contato` (com o local), `instagram_click`, `guia_aberto` e `guia_planejar`. Para rastrear um novo botão, basta `data-track="nome"` nele.
+Sem configuração, **nada é carregado nem enviado** (a Vercel Analytics e o Speed Insights continuam como estavam). Ao configurar Plausible ou Umami, o site registra: `hero_planejar`, `header_planejar`, `oferta_selecionada` (id do item e tipo), `vitrine_outro_destino`, `cotacao_personalizar` (abriu a área opcional), `form_submit_valido` (chegou à revisão; leva só o id da oferta, se houver), `whatsapp_abrir`, `mensagem_copiada`, `whatsapp_contato` (com o local do botão), `instagram_click`, `guia_aberto`, `destino_cotar` e `guia_planejar`. **Nenhum evento leva nome, origem, datas ou qualquer dado digitado no formulário.** Para rastrear um novo botão, basta `data-track="nome"` nele.
 
 ## SEO
 
@@ -76,11 +89,13 @@ Expectativa realista: termos genéricos como "viagens" ou "hotéis" são disputa
 ## Pendências antes de publicar
 
 1. **Domínio**: `https://grgviagens.com.br` já é o padrão do site. Falta só o registro DNS do `www` (veja a seção SEO).
-2. **Cadastur**: preencha `NEXT_PUBLIC_CADASTUR` só quando o registro estiver aprovado.
+2. **Cadastur e CNPJ**: publicados (rodapé, seção institucional e `taxID` nos dados estruturados). Não há link de certificado nem selo: só o número informado.
 3. **Depoimentos**: [src/content/testimonials.ts](src/content/testimonials.ts) está vazio e a seção não aparece. Adicione apenas depoimentos reais e autorizados.
 4. **Serviços não publicados**: "Seguro viagem" e "Cruzeiros" só entram quando a GRG confirmar (`services` em [src/content/text.ts](src/content/text.ts)).
 5. **Guias e destinos** ([src/content/guides.ts](src/content/guides.ts), [src/content/places.ts](src/content/places.ts)): textos gerais, sem preços, datas, disponibilidade nem regras de bagagem. Revisar com a GRG e fontes oficiais.
-6. **Dados institucionais** (endereço, CNPJ, anos de atuação): não fornecidos, ficam fora do site.
+6. **Dados institucionais** (razão social, endereço, e-mail, horário de atendimento, anos de atuação): não fornecidos, ficam fora do site. Preencha em `src/config/site.ts` quando confirmar; aparecem sozinhos.
+9. **Ofertas vigentes**: cadastrar em `src/content/offers.ts` quando a GRG confirmar.
+10. **Fotos da equipe**: a seção institucional usa a logo e a paleta. Fotos reais e autorizadas da equipe podem entrar depois.
 7. **Fotografias**: reais, do Wikimedia Commons (CC BY, CC BY-SA, CC0 ou domínio público), com créditos no rodapé, na ampliação da galeria e nas páginas de destino ([src/content/photos.ts](src/content/photos.ts)). Fotos próprias da GRG podem substituí-las em `public/images/fotos/`.
 8. **Google Meu Negócio**: criar e verificar o perfil (fora do site).
 
@@ -89,9 +104,12 @@ Expectativa realista: termos genéricos como "viagens" ou "hotéis" são disputa
 - `src/content/`: textos, destinos, guias, galeria, faixa de inspirações, créditos das fotos
 - `src/config/site.ts`: contatos, navegação, analytics
 - `src/lib/whatsapp.ts`: validação, mensagem e link `wa.me`; `src/lib/analytics.ts`: eventos
-- `src/components/`: uma seção por arquivo (`About.tsx` é a seção institucional aprovada e não deve ser alterada)
+- `src/content/offers.ts`: vitrine da página inicial
+- `src/components/`: uma seção por arquivo (`Hero`, `Benefits`, `Offers`, `WhyGrg`, `Planner`, `Services`, `HowItWorks`, `Faq`, `Closing`, `Footer`, `Dock`). A galeria, a faixa "Instagram" (que não mostrava posts reais), a lista de guias e a antiga seção "Prazer, somos a GRG" saíram da home; guias e destinos continuam em `/dicas` e `/destinos`.
 - `src/app/globals.css`: tokens de cor/tipografia, hovers e animações
 
 ## Fotos
 
-Cards de destino e a faixa do Instagram usam fontes já cortadas em 4:5 (até 1600×2000); a galeria e as páginas de destino usam fontes maiores, com `sizes` calculado pela largura realmente renderizada (com `object-cover` a foto aparece maior que o quadro). O Next serve AVIF/WebP no tamanho certo para cada tela.
+A abertura usa a Praia do Leão (Fernando de Noronha, 3200×2000, CC BY-SA 3.0), com enquadramento próprio para celular e desktop em `globals.css` (`.hero-img`). A vitrine usa as fotos 4:5 dos destinos; as páginas de destino usam fontes maiores, com `sizes` calculado pela largura realmente renderizada (com `object-cover` a foto aparece maior que o quadro). O Next serve AVIF/WebP no tamanho certo para cada tela.
+
+As fotos `gal-*` e `inspira-*` em `public/images/fotos/` não são mais exibidas (e por isso saíram dos créditos). Ficaram no repositório para reaproveitamento; podem ser apagadas.

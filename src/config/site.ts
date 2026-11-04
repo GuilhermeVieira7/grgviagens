@@ -14,8 +14,10 @@
  * Google Search Console: cole o código de verificação em NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
  * (Configurações > Propriedade > Método de tag HTML). Sem ele, nada é emitido.
  *
- * Cadastur: deixe vazio até a agência ter o registro aprovado. Quando preenchido,
- * o número aparece no rodapé com link para o site oficial de consulta.
+ * Dados institucionais confirmados pela GRG (nov/2026): CNPJ e número do Cadastur.
+ * Aparecem no rodapé e na seção institucional. Razão social, endereço, e-mail e
+ * horário de atendimento ainda não foram informados: deixe vazio até confirmar
+ * (campos vazios não aparecem no site).
  *
  * Analytics (opcional, sem cookies): defina NEXT_PUBLIC_PLAUSIBLE_DOMAIN
  * (ex.: "grgviagens.com.br") ou NEXT_PUBLIC_UMAMI_WEBSITE_ID (+ NEXT_PUBLIC_UMAMI_SRC).
@@ -24,7 +26,8 @@
 const WHATSAPP_NUMBER = "5594999099386"; // (94) 99909-9386
 const WHATSAPP_CONTACT_URL = "https://wa.link/fj7dxp";
 const INSTAGRAM_URL = "https://www.instagram.com/grgviagens";
-const CADASTUR_NUMBER = "";
+const CADASTUR_NUMBER = "69.217.621/0001-28";
+const CNPJ = "69.217.621/0001-28";
 const SITE_URL = "https://grgviagens.com.br";
 
 export const siteConfig = {
@@ -33,6 +36,12 @@ export const siteConfig = {
   whatsappContactUrl: process.env.NEXT_PUBLIC_WHATSAPP_CONTACT_URL || WHATSAPP_CONTACT_URL,
   instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL || INSTAGRAM_URL,
   cadastur: process.env.NEXT_PUBLIC_CADASTUR || CADASTUR_NUMBER,
+  cnpj: CNPJ,
+  /** Preencha só com dados confirmados. Vazio = não aparece. */
+  legalName: "",
+  address: "",
+  email: "",
+  hours: "",
   siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL).replace(/\/+$/, ""),
   googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
   plausibleDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || "",
@@ -43,8 +52,8 @@ export const siteConfig = {
 /** Links com "/" no começo funcionam na página inicial e nas subpáginas. */
 export const navLinks = [
   { label: "Destinos", href: "/#destinos" },
+  { label: "A GRG", href: "/#sobre" },
   { label: "Serviços", href: "/#servicos" },
-  { label: "Como funciona", href: "/#como-funciona" },
   { label: "Dúvidas", href: "/#duvidas" },
 ];
 
@@ -53,7 +62,6 @@ export const footerLinks = [
   { label: "Viagens nacionais", href: "/viagens-nacionais" },
   { label: "Viagens internacionais", href: "/viagens-internacionais" },
   { label: "Serviços", href: "/servicos" },
-  { label: "Galeria", href: "/#galeria" },
   { label: "Planejar minha viagem", href: "/#planejador" },
   { label: "Como funciona", href: "/#como-funciona" },
   { label: "Sobre a GRG", href: "/#sobre" },

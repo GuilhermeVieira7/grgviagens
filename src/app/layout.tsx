@@ -26,7 +26,7 @@ const figtree = Figtree({
 
 const title = "GRG Viagens: agência de viagens e turismo, pacotes e passagens";
 const description =
-  "Agência de viagens e turismo: passagens aéreas, hotéis, pacotes de viagem, passeios, ingressos e aluguel de carro. Peça sua cotação personalizada pelo WhatsApp.";
+  "Agência de viagens e turismo cadastrada no Cadastur: passagens aéreas, hospedagem, pacotes personalizados, passeios, ingressos e locação de veículos. Peça sua cotação pelo WhatsApp.";
 
 export const metadata: Metadata = {
   // Domínio oficial em src/config/site.ts (ou NEXT_PUBLIC_SITE_URL)

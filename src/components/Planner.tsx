@@ -1,21 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { siteConfig } from "@/config/site";
+import type { SelectionContext } from "@/content/offers";
 import { destinationOptions, originOptions } from "@/content/locations";
 import { track } from "@/lib/analytics";
 import { DESTINATION_EVENT } from "@/lib/planner-bus";
 import {
   buildMessage,
-  interestLabels,
+  serviceChoiceLabels,
   todayISO,
   validateRequest,
   whatsappHref,
+  type BudgetBasis,
   type FieldErrors,
-  type Interest,
+  type ServiceChoice,
   type TripRequest,
 } from "@/lib/whatsapp";
 import { Arrow } from "./Arrow";
 import { Combobox } from "./Combobox";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 const noopSubscribe = () => () => {};
 const toInt = (s: string) => (s.trim() === "" ? NaN : Number(s));
@@ -57,7 +61,11 @@ function Field({
         {label}
       </label>
       {children}
-      {hint && !error && <p className="mt-1.5 text-sm text-ink/70">{hint}</p>}
+      {hint && !error && (
+        <p id={`${id}-hint`} className="mt-1.5 text-sm text-ink/70">
+          {hint}
+        </p>
+      )}
       {error && (
         <p id={`${id}-err`} className="field-error">
           {error}
@@ -118,74 +126,94 @@ function Stepper({
   );
 }
 
-const STEP_KEYS: (keyof FieldErrors)[][] = [
-  ["name", "origin", "destination"],
-  ["departure", "returnDate"],
-  ["adults", "children", "childAges"],
-  [],
+const ERROR_ORDER: [keyof FieldErrors, string][] = [
+  ["name", "f-name"],
+  ["origin", "f-origin"],
+  ["destination", "f-destination"],
+  ["departure", "f-departure"],
+  ["returnDate", "f-return"],
+  ["adults", "f-adults"],
+  ["children", "f-children"],
+  ["childAges", "f-age-0"],
 ];
-const STEP_NAMES = ["Sua viagem", "Quando", "Quem vai", "O que você imagina"];
-const isMobile = () => window.matchMedia("(max-width: 639px)").matches;
 
+/**
+ * Pedido de cotação. Três grupos curtos (viagem, datas, viajantes) e uma área
+ * opcional "Personalizar minha viagem". Ao final o visitante revisa (e pode
+ * editar) a mensagem, que abre no WhatsApp oficial para ele mesmo enviar.
+ * Nada é enviado pelo site e nenhum dado é guardado.
+ */
 export function Planner({ defaultDestination = "" }: { defaultDestination?: string }) {
   const uid = useId();
   const [name, setName] = useState("");
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState(defaultDestination);
-  const [step, setStep] = useState(0);
+  const [selection, setSelection] = useState<SelectionContext | null>(null);
   const [undecidedDest, setUndecidedDest] = useState(false);
   const [departure, setDeparture] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [undecidedDates, setUndecidedDates] = useState(false);
   const [flexibleDates, setFlexibleDates] = useState(false);
-  const [interest, setInterest] = useState<Interest>("");
-  const [budget, setBudget] = useState("");
   const [approx, setApprox] = useState("");
   const [adults, setAdults] = useState("2");
   const [children, setChildren] = useState("0");
   const [childAges, setChildAges] = useState<string[]>([]);
+  const [services, setServices] = useState<ServiceChoice[]>([]);
+  const [budget, setBudget] = useState("");
+  const [budgetBasis, setBudgetBasis] = useState<BudgetBasis>("total");
+  const [lodging, setLodging] = useState("");
   const [notes, setNotes] = useState("");
+  const [customOpen, setCustomOpen] = useState(false);
 
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [review, setReview] = useState(false);
+  const [message, setMessage] = useState("");
   const [announce, setAnnounce] = useState("");
-  const [copied, setCopied] = useState<"idle" | "ok" | "fail">("idle");
+  const [status, setStatus] = useState<"idle" | "copied" | "copy-fail" | "opened">("idle");
   // vazio no servidor; data local do visitante no navegador
   const today = useSyncExternalStore(noopSubscribe, () => todayISO(), () => "");
 
   const originRef = useRef<HTMLInputElement>(null);
-  const summaryRef = useRef<HTMLHeadingElement>(null);
+  const reviewRef = useRef<HTMLHeadingElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const applyDestination = useCallback((label: string) => {
-    setDestination(label);
+  const applySelection = useCallback((sel: SelectionContext) => {
+    setSelection(sel);
+    setDestination(sel.destination);
     setUndecidedDest(false);
+    if (sel.origin) setOrigin((o) => o || sel.origin!);
     setErrors((e) => ({ ...e, destination: undefined }));
-    setSubmitted(false);
-    setAnnounce(`Destino escolhido: ${label}. Agora conte de onde você vai sair.`);
+    setReview(false);
+    setStatus("idle");
+    setAnnounce(`Destino escolhido: ${sel.destination}. Agora conte de onde você vai sair e quando.`);
     // Em telas de toque, focar abriria o teclado e cobriria o formulário
     if (window.matchMedia("(pointer: fine)").matches) {
-      window.setTimeout(() => originRef.current?.focus({ preventScroll: true }), 450);
+      window.setTimeout(() => originRef.current?.focus({ preventScroll: true }), 500);
     }
   }, []);
 
   useEffect(() => {
-    // Destino escolhido antes da hidratação do planejador
+    // Escolha feita antes da hidratação do formulário
     const pending = window.setTimeout(() => {
-      if (window.__grgDestino) applyDestination(window.__grgDestino);
+      if (window.__grgEscolha) applySelection(window.__grgEscolha);
     }, 0);
-    const onChoose = (e: Event) => applyDestination((e as CustomEvent<string>).detail);
+    const onChoose = (e: Event) => applySelection((e as CustomEvent<SelectionContext>).detail);
     window.addEventListener(DESTINATION_EVENT, onChoose);
     return () => {
       window.clearTimeout(pending);
       window.removeEventListener(DESTINATION_EVENT, onChoose);
     };
-  }, [applyDestination]);
+  }, [applySelection]);
 
   const childrenN = (() => {
     const n = toInt(children);
     return Number.isInteger(n) && n > 0 ? Math.min(n, MAX_CHILDREN) : 0;
   })();
+
+  // A escolha da vitrine continua valendo enquanto o destino não for trocado
+  const activeSelection =
+    selection && !undecidedDest && selection.destination === destination.trim() ? selection : null;
 
   const request = (): TripRequest => ({
     name,
@@ -200,97 +228,55 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
     adults: toInt(adults),
     children: toInt(children),
     childAges: Array.from({ length: childrenN }, (_, i) => childAges[i] ?? ""),
-    interest,
+    services,
     budget,
+    budgetBasis,
+    lodging,
     notes,
+    selection: activeSelection,
   });
 
   const focusFirstError = (errs: FieldErrors) => {
-    const order: [keyof FieldErrors, string][] = [
-      ["name", "f-name"],
-      ["origin", "f-origin"],
-      ["destination", "f-destination"],
-      ["departure", "f-departure"],
-      ["returnDate", "f-return"],
-      ["adults", "f-adults"],
-      ["children", "f-children"],
-      ["childAges", "f-age-0"],
-    ];
-    for (const [key, id] of order) {
-      if (errs[key]) {
-        let target = document.getElementById(id);
-        if (key === "childAges") {
-          const firstEmpty = Array.from({ length: childrenN }, (_, i) => i).find((i) => !(childAges[i] ?? ""));
-          target = document.getElementById(`f-age-${firstEmpty ?? 0}`);
-        }
-        target?.focus();
-        return;
+    for (const [key, id] of ERROR_ORDER) {
+      if (!errs[key]) continue;
+      let target = document.getElementById(id);
+      if (key === "childAges") {
+        const firstEmpty = Array.from({ length: childrenN }, (_, i) => i).find((i) => !(childAges[i] ?? ""));
+        target = document.getElementById(`f-age-${firstEmpty ?? 0}`);
       }
-    }
-  };
-
-  const grp = (i: number) => (step === i ? "" : "step-hidden");
-  const stepOf = (key: keyof FieldErrors) => STEP_KEYS.findIndex((keys) => keys.includes(key));
-
-  const goToStep = (n: number) => {
-    setStep(n);
-    window.setTimeout(() => {
-      const t = document.getElementById(`step-title-${n}`);
-      t?.focus({ preventScroll: true });
-      t?.scrollIntoView({ block: "center", behavior: "auto" });
-    }, 60);
-  };
-  const next = () => {
-    const errs = validateRequest(request(), today || todayISO());
-    const mine: FieldErrors = {};
-    for (const k of STEP_KEYS[step]) if (errs[k]) mine[k] = errs[k];
-    setErrors(mine);
-    if (Object.keys(mine).length > 0) {
-      setAnnounce("Confira os campos destacados para continuar.");
-      window.setTimeout(() => focusFirstError(mine), 30);
+      target?.focus();
+      target?.scrollIntoView({ block: "center" });
       return;
     }
-    setAnnounce("");
-    goToStep(Math.min(3, step + 1));
-  };
-  const back = () => {
-    setAnnounce("");
-    goToStep(Math.max(0, step - 1));
   };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isMobile() && step < 3) {
-      next();
-      return;
-    }
     const errs = validateRequest(request(), today || todayISO());
     setErrors(errs);
     if (Object.keys(errs).length > 0) {
-      setAnnounce("Confira os campos destacados para continuar.");
-      const first = (Object.keys(errs) as (keyof FieldErrors)[]).map(stepOf).sort()[0];
-      if (isMobile() && first >= 0 && first !== step) {
-        setStep(first);
-        window.setTimeout(() => focusFirstError(errs), 80);
-      } else {
-        focusFirstError(errs);
-      }
+      const n = Object.keys(errs).length;
+      setAnnounce(n === 1 ? "Falta 1 informação. Confira o campo destacado." : `Faltam ${n} informações. Confira os campos destacados.`);
+      window.setTimeout(() => focusFirstError(errs), 30);
       return;
     }
-    track("form_submit_valido", { destino: undecidedDest ? "indefinido" : destination });
+    track("form_submit_valido", activeSelection ? { oferta: activeSelection.id } : undefined);
     setAnnounce("");
-    setCopied("idle");
-    setSubmitted(true);
-    window.setTimeout(() => summaryRef.current?.focus(), 50);
+    setStatus("idle");
+    setMessage(buildMessage(request()));
+    setReview(true);
+    window.setTimeout(() => {
+      cardRef.current?.scrollIntoView({ block: "start" });
+      reviewRef.current?.focus({ preventScroll: true });
+    }, 50);
   };
 
-  const message = submitted ? buildMessage(request()) : "";
-  const href = submitted ? whatsappHref(message) : null;
+  const href = review && message.trim() ? whatsappHref(message) : null;
 
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(message);
-      setCopied("ok");
+      setStatus("copied");
       track("mensagem_copiada");
     } catch {
       const ta = messageRef.current;
@@ -298,20 +284,42 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
         ta.focus();
         ta.select();
         try {
-          setCopied(document.execCommand("copy") ? "ok" : "fail");
-          return;
+          if (document.execCommand("copy")) {
+            setStatus("copied");
+            track("mensagem_copiada");
+            return;
+          }
         } catch {
           /* segue para a mensagem de falha */
         }
       }
-      setCopied("fail");
+      setStatus("copy-fail");
     }
   };
 
+  const backToForm = () => {
+    setReview(false);
+    setStatus("idle");
+    window.setTimeout(() => {
+      cardRef.current?.scrollIntoView({ block: "start" });
+      document.getElementById("f-name")?.focus({ preventScroll: true });
+    }, 50);
+  };
+
+  const clearSelection = () => {
+    setSelection(null);
+    setDestination("");
+    window.__grgEscolha = undefined;
+    // Sem focar o campo: a lista de sugestões abriria por cima de "Ainda não escolhi o destino"
+    setAnnounce("Destino removido. Escolha outro destino ou marque “Ainda não escolhi o destino”.");
+  };
+
+  const toggleService = (k: ServiceChoice) =>
+    setServices((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
+
   const invalid = (k: keyof FieldErrors) => (errors[k] ? true : undefined);
   const describe = (k: keyof FieldErrors, id: string) => (errors[k] ? `${id}-err` : undefined);
-  const showAlert = announce.startsWith("Confira");
-  const showChosen = announce.startsWith("Destino escolhido");
+  const errorCount = Object.values(errors).filter(Boolean).length;
 
   return (
     <section
@@ -322,18 +330,18 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
       <div className="wrap-wide grid gap-10 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
-            <p className="eyebrow text-lagoon">Planejador de viagem</p>
+            <p className="eyebrow text-lagoon">Pedido de cotação</p>
             <h2 id="planejador-title" className="h-section mt-5">
-              Sua próxima viagem começa aqui.
+              Conte como você quer viajar.
             </h2>
             <p className="lead mt-6 max-w-[32rem] text-white/90">
-              Conte para a GRG o que você está planejando. Nossa equipe pesquisa as possibilidades e prepara uma cotação
-              personalizada para você.
+              Com origem, destino, período e quem vai, a equipe da GRG já consegue pesquisar as opções e montar a sua
+              cotação.
             </p>
             <ul className="mt-8 space-y-3 text-white/85">
               {[
-                "Leva poucos minutos para preencher.",
-                "Você confere a mensagem antes de enviar: nada é enviado automaticamente.",
+                "Sem cadastro e sem pedir telefone ou e-mail.",
+                "Você revisa a mensagem antes: nada é enviado automaticamente.",
                 "Valores e condições são informados pelo atendimento.",
               ].map((t) => (
                 <li key={t} className="flex gap-3">
@@ -342,38 +350,66 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                 </li>
               ))}
             </ul>
+            <p className="mt-8 text-white/80">
+              Prefere conversar direto?{" "}
+              <a
+                href={siteConfig.whatsappContactUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="whatsapp_contato"
+                data-track-local="planejador_lateral"
+                className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-white underline decoration-lagoon underline-offset-4 hover:text-lagoon"
+              >
+                Chame no WhatsApp
+              </a>
+            </p>
           </div>
         </div>
 
         <div className="lg:col-span-7">
-          <div className="on-light rounded-[28px] bg-white p-6 text-ink shadow-[0_30px_70px_-20px_rgb(1_10_38/0.6)] sm:p-10 lg:p-12">
+          <div
+            id="cotacao-form"
+            ref={cardRef}
+            className="on-light rounded-[10px] bg-white p-5 text-ink sm:p-9 lg:p-11"
+          >
             <p className="sr-only" role="status" aria-live="polite">
               {announce}
             </p>
 
-            {!submitted ? (
+            {!review ? (
               <form onSubmit={onSubmit} noValidate aria-label="Pedido de cotação de viagem" className="grid gap-8">
-                <div className="sm:hidden" role="group" aria-label={`Passo ${step + 1} de 4: ${STEP_NAMES[step]}`}>
-                  <p className="text-sm font-bold text-abyss">
-                    Passo {step + 1} de 4 <span className="font-normal text-ink/70">· {STEP_NAMES[step]}</span>
-                  </p>
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-mist" aria-hidden="true">
-                    <div className="h-full rounded-full bg-royal transition-[width] duration-300" style={{ width: `${(step + 1) * 25}%` }} />
+                {activeSelection && (
+                  <div className="selection" aria-label="Destino escolhido na vitrine">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-royal">
+                        {activeSelection.isOffer ? "Pacote escolhido" : "Destino escolhido"}
+                      </p>
+                      <p className="display mt-1 text-[1.5rem] text-abyss">{activeSelection.destination}</p>
+                      {activeSelection.details.length > 0 && (
+                        <ul className="mt-2 space-y-0.5 text-[0.9375rem] text-ink/80">
+                          {activeSelection.details.map((d) => (
+                            <li key={d}>{d}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                    <button type="button" onClick={clearSelection} className="min-h-11 flex-none font-semibold text-royal underline underline-offset-4">
+                      Trocar
+                    </button>
                   </div>
-                </div>
-
-                {showAlert && (
-                  <p className="rounded-xl border-2 border-[#b3261e] bg-[#fdf1f0] px-4 py-3 font-semibold text-[#8c1d18]">
-                    {announce}
-                  </p>
                 )}
-                {showChosen && (
-                  <p className="rounded-xl bg-paper px-4 py-3 font-semibold text-abyss">{announce.split(".")[0]}.</p>
+
+                {errorCount > 0 && (
+                  <p className="rounded-[8px] border-2 border-[#b3261e] bg-[#fdf1f0] px-4 py-3 font-semibold text-[#8c1d18]">
+                    {errorCount === 1
+                      ? "Falta 1 informação. Confira o campo destacado."
+                      : `Faltam ${errorCount} informações. Confira os campos destacados.`}
+                  </p>
                 )}
 
                 {/* Viagem */}
-                <div className={`form-group sm:grid-cols-2 ${grp(0)}`}>
-                  <h3 id="step-title-0" tabIndex={-1} className="form-title outline-none sm:col-span-2">Sua viagem</h3>
+                <div role="group" aria-labelledby="g-viagem" className="form-group form-group-first sm:grid-cols-2">
+                  <h3 id="g-viagem" className="form-title sm:col-span-2">Sua viagem</h3>
                   <div className="sm:col-span-2">
                     <Field id="f-name" label="Seu nome" error={errors.name}>
                       <input
@@ -383,10 +419,14 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                         autoComplete="name"
                         placeholder="Como podemos chamar você?"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => {
+                          setName(e.target.value);
+                          setErrors((x) => ({ ...x, name: undefined }));
+                        }}
                         aria-invalid={invalid("name")}
                         aria-describedby={describe("name", "f-name")}
                         aria-required="true"
+                        maxLength={80}
                       />
                     </Field>
                   </div>
@@ -397,21 +437,27 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                       autoComplete="address-level2"
                       placeholder="De onde você vai sair?"
                       value={origin}
-                      onChange={setOrigin}
+                      onChange={(v) => {
+                        setOrigin(v);
+                        setErrors((x) => ({ ...x, origin: undefined }));
+                      }}
                       options={originOptions}
                       ariaInvalid={invalid("origin")}
                       ariaDescribedBy={describe("origin", "f-origin")}
                       ariaRequired
                     />
                   </Field>
-                  <div>
+                  <div className="min-w-0">
                     <Field id="f-destination" label="Destino desejado" error={errors.destination}>
                       <Combobox
                         id="f-destination"
                         placeholder="Para onde quer ir?"
                         value={undecidedDest ? "" : destination}
                         disabled={undecidedDest}
-                        onChange={setDestination}
+                        onChange={(v) => {
+                          setDestination(v);
+                          setErrors((x) => ({ ...x, destination: undefined }));
+                        }}
                         options={destinationOptions}
                         ariaInvalid={invalid("destination")}
                         ariaDescribedBy={describe("destination", "f-destination")}
@@ -433,21 +479,21 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                 </div>
 
                 {/* Datas */}
-                <div className={`form-group sm:grid-cols-2 ${grp(1)}`}>
-                  <h3 id="step-title-1" tabIndex={-1} className="form-title outline-none sm:col-span-2">Quando</h3>
+                <div role="group" aria-labelledby="g-quando" className="form-group sm:grid-cols-2">
+                  <h3 id="g-quando" className="form-title sm:col-span-2">Quando</h3>
                   <Field id="f-departure" label="Data de ida" error={errors.departure}>
                     <input
                       id="f-departure"
                       className="field"
                       type="date"
-                      min={today}
+                      min={today || undefined}
                       value={undecidedDates ? "" : departure}
                       disabled={undecidedDates}
                       onChange={(e) => {
                         const v = e.target.value;
                         setDeparture(v);
                         if (returnDate && v && returnDate < v) setReturnDate("");
-                        setErrors((x) => ({ ...x, departure: undefined }));
+                        setErrors((x) => ({ ...x, departure: undefined, returnDate: undefined }));
                       }}
                       aria-invalid={invalid("departure")}
                       aria-describedby={describe("departure", "f-departure")}
@@ -459,10 +505,13 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                       id="f-return"
                       className="field"
                       type="date"
-                      min={departure || today}
+                      min={departure || today || undefined}
                       value={undecidedDates ? "" : returnDate}
                       disabled={undecidedDates}
-                      onChange={(e) => setReturnDate(e.target.value)}
+                      onChange={(e) => {
+                        setReturnDate(e.target.value);
+                        setErrors((x) => ({ ...x, returnDate: undefined }));
+                      }}
                       aria-invalid={invalid("returnDate")}
                       aria-describedby={describe("returnDate", "f-return")}
                     />
@@ -518,10 +567,18 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                       <div className="mt-3">
                         <Field
                           id="f-approx"
-                          label="Época aproximada (opcional)"
+                          label="Período aproximado (opcional)"
                           hint="Por exemplo: julho, férias de fim de ano, feriado prolongado."
                         >
-                          <input id="f-approx" className="field" type="text" value={approx} onChange={(e) => setApprox(e.target.value)} />
+                          <input
+                            id="f-approx"
+                            className="field"
+                            type="text"
+                            maxLength={80}
+                            aria-describedby="f-approx-hint"
+                            value={approx}
+                            onChange={(e) => setApprox(e.target.value)}
+                          />
                         </Field>
                       </div>
                     )}
@@ -529,8 +586,8 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                 </div>
 
                 {/* Viajantes */}
-                <div className={`form-group sm:grid-cols-2 ${grp(2)}`}>
-                  <h3 id="step-title-2" tabIndex={-1} className="form-title outline-none sm:col-span-2">Quem vai</h3>
+                <div role="group" aria-labelledby="g-quem" className="form-group sm:grid-cols-2">
+                  <h3 id="g-quem" className="form-title sm:col-span-2">Quem vai</h3>
                   <div className="min-w-0">
                     <Stepper
                       id="f-adults"
@@ -575,8 +632,11 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                   </div>
 
                   {childrenN > 0 && (
-                    <fieldset className="min-w-0 sm:col-span-2" aria-describedby={errors.childAges ? "f-ages-err" : undefined}>
+                    <fieldset className="min-w-0 sm:col-span-2" aria-describedby={errors.childAges ? "f-ages-err" : "f-ages-hint"}>
                       <legend className="field-label">Idade de cada criança</legend>
+                      <p id="f-ages-hint" className="-mt-1 mb-3 text-sm text-ink/70">
+                        A idade na data da viagem muda tarifas e regras de hospedagem.
+                      </p>
                       <div className="grid gap-4 sm:grid-cols-2">
                         {Array.from({ length: childrenN }, (_, i) => (
                           <div key={i} className="min-w-0">
@@ -614,114 +674,165 @@ export function Planner({ defaultDestination = "" }: { defaultDestination?: stri
                   )}
                 </div>
 
-                {/* Preferências */}
-                <div className={`form-group ${grp(3)}`}>
-                  <h3 id="step-title-3" tabIndex={-1} className="form-title outline-none">O que você imagina</h3>
-                  <fieldset>
-                    <legend className="field-label">O que você quer cotar? (opcional)</legend>
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-                      {(Object.keys(interestLabels) as Exclude<Interest, "">[]).map((k) => (
-                        <label key={k} className="pill-radio">
-                          <input type="radio" name="interesse" value={k} checked={interest === k} onChange={() => setInterest(k)} />
-                          <span>{interestLabels[k]}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-                  <Field id="f-budget" label="Orçamento aproximado (opcional)" hint="Ajuda a equipe a buscar opções no seu perfil. Não é um compromisso.">
-                    <input
-                      id="f-budget"
-                      className="field"
-                      type="text"
-                      placeholder="Ex.: até R$ 8.000 no total"
-                      value={budget}
-                      onChange={(e) => setBudget(e.target.value)}
-                      maxLength={80}
-                    />
-                  </Field>
-                  <Field id="f-notes" label="Observações adicionais (opcional)">
-                    <textarea
-                      id="f-notes"
-                      className="field min-h-28 resize-y"
-                      rows={3}
-                      maxLength={500}
-                      placeholder="Ex.: hotel perto da praia, passeios, aluguel de carro, viagem de lua de mel…"
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                    />
-                  </Field>
-                </div>
-
-                <div className="flex gap-3 sm:hidden">
-                  {step > 0 && (
-                    <button type="button" className="btn btn-outline-dark flex-1" onClick={back}>
-                      Voltar
-                    </button>
-                  )}
-                  {step < 3 && (
-                    <button type="button" className="btn btn-royal flex-[2]" onClick={next}>
-                      Continuar <Arrow />
-                    </button>
-                  )}
-                </div>
-                <button
-                  type="submit"
-                  className={`btn btn-royal !min-h-16 w-full !text-[1.0625rem] ${step === 3 ? "" : "step-hidden"}`}
+                {/* Opcional */}
+                <details
+                  className="custom"
+                  open={customOpen}
+                  onToggle={(e) => {
+                    const open = (e.currentTarget as HTMLDetailsElement).open;
+                    setCustomOpen(open);
+                    if (open) track("cotacao_personalizar");
+                  }}
                 >
-                  Solicitar minha cotação <Arrow />
-                </button>
+                  <summary>
+                    <span>
+                      <span className="block font-bold text-abyss">Personalizar minha viagem</span>
+                      <span className="block text-sm text-ink/70">Opcional: serviços, orçamento, hospedagem e observações.</span>
+                    </span>
+                    <span className="custom-icon" aria-hidden="true">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M8 3v10M3 8h10" />
+                      </svg>
+                    </span>
+                  </summary>
+
+                  <div className="grid gap-6 pt-5">
+                    <fieldset>
+                      <legend className="field-label">O que você quer cotar?</legend>
+                      <div className="flex flex-wrap gap-2">
+                        {(Object.keys(serviceChoiceLabels) as ServiceChoice[]).map((k) => (
+                          <label key={k} className="pill-check">
+                            <input type="checkbox" checked={services.includes(k)} onChange={() => toggleService(k)} />
+                            <span>{serviceChoiceLabels[k]}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+
+                    <div className="grid gap-3">
+                      <Field id="f-budget" label="Orçamento aproximado" hint="Ajuda a buscar opções no seu perfil. Não é um compromisso.">
+                        <input
+                          id="f-budget"
+                          className="field"
+                          type="text"
+                          inputMode="text"
+                          placeholder="Ex.: até R$ 8.000"
+                          aria-describedby="f-budget-hint"
+                          value={budget}
+                          onChange={(e) => setBudget(e.target.value)}
+                          maxLength={60}
+                        />
+                      </Field>
+                      <fieldset className="flex flex-wrap gap-x-6" aria-label="O orçamento é">
+                        <label className="check">
+                          <input type="radio" name={`${uid}-basis`} checked={budgetBasis === "total"} onChange={() => setBudgetBasis("total")} />
+                          Total da viagem
+                        </label>
+                        <label className="check">
+                          <input type="radio" name={`${uid}-basis`} checked={budgetBasis === "pessoa"} onChange={() => setBudgetBasis("pessoa")} />
+                          Por pessoa
+                        </label>
+                      </fieldset>
+                    </div>
+
+                    <Field id="f-lodging" label="Preferências de hospedagem">
+                      <input
+                        id="f-lodging"
+                        className="field"
+                        type="text"
+                        placeholder="Ex.: perto da praia, com café da manhã, quarto família"
+                        value={lodging}
+                        onChange={(e) => setLodging(e.target.value)}
+                        maxLength={160}
+                      />
+                    </Field>
+
+                    <Field id="f-notes" label="Observações">
+                      <textarea
+                        id="f-notes"
+                        className="field min-h-28 resize-y"
+                        rows={3}
+                        maxLength={500}
+                        placeholder="Ex.: lua de mel, voo direto se possível, aniversário durante a viagem…"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                      />
+                    </Field>
+                  </div>
+                </details>
+
+                <div>
+                  <button type="submit" className="btn btn-royal !min-h-16 w-full !text-[1.0625rem]">
+                    Revisar minha mensagem <Arrow />
+                  </button>
+                  <p className="mt-3 text-center text-sm text-ink/75">
+                    No próximo passo você confere o texto e abre o WhatsApp da GRG para enviar.
+                  </p>
+                </div>
               </form>
             ) : (
               <div>
+                <p className="text-sm font-semibold text-royal">Último passo</p>
                 <h3
-                  ref={summaryRef}
+                  ref={reviewRef}
                   tabIndex={-1}
-                  className="display text-[clamp(1.75rem,3vw,2.375rem)] text-abyss outline-none"
+                  className="display mt-1 text-[clamp(1.75rem,3vw,2.375rem)] text-abyss outline-none"
                 >
-                  Confira o seu pedido
+                  Confira a sua mensagem
                 </h3>
                 <p className="mt-3 text-ink/80">
                   {href
-                    ? "Revise a mensagem abaixo. Ao abrir o WhatsApp, você mesmo envia para a GRG."
-                    : "Revise a mensagem abaixo, copie e envie para a GRG pelo WhatsApp."}
+                    ? "Se quiser, ajuste o texto. Ao tocar em “Abrir o WhatsApp”, a conversa com a GRG abre com a mensagem pronta; ela só é enviada quando você tocar em enviar por lá."
+                    : "Copie a mensagem e envie para a GRG pelo WhatsApp."}
                 </p>
 
-                <label htmlFor={`${uid}-msg`} className="sr-only">
-                  Mensagem do pedido
+                <label htmlFor={`${uid}-msg`} className="field-label mt-6">
+                  Mensagem para a GRG
                 </label>
                 <textarea
                   id={`${uid}-msg`}
                   ref={messageRef}
-                  readOnly
                   value={message}
-                  rows={Math.min(14, message.split("\n").length + 1)}
-                  className="mt-5 w-full resize-none rounded-2xl border-l-[6px] border-lagoon bg-paper p-5 font-sans text-base leading-relaxed text-ink"
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                    setStatus("idle");
+                  }}
+                  rows={Math.min(16, message.split("\n").length + 1)}
+                  className="field review-msg w-full resize-y font-sans leading-relaxed"
                 />
 
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   {href && (
-                    <a href={href} target="_blank" rel="noopener noreferrer" className="btn btn-royal" data-track="whatsapp_abrir" data-track-local="planejador">
-                      Abrir no WhatsApp <Arrow />
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-royal"
+                      data-track="whatsapp_abrir"
+                      data-track-local="planejador"
+                      onClick={() => setStatus("opened")}
+                    >
+                      <WhatsAppIcon className="h-5 w-5" /> Abrir o WhatsApp
                     </a>
                   )}
                   <button type="button" onClick={copy} className={`btn ${href ? "btn-outline-dark" : "btn-royal"}`}>
                     Copiar mensagem
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSubmitted(false);
-                      setCopied("idle");
-                    }}
-                    className="btn btn-outline-dark"
-                  >
+                  <button type="button" onClick={backToForm} className="btn btn-outline-dark">
                     Editar pedido
                   </button>
                 </div>
 
-                <p role="status" aria-live="polite" className="mt-4 min-h-6 font-semibold text-abyss">
-                  {copied === "ok" && "Mensagem copiada. Agora é só colar no WhatsApp."}
-                  {copied === "fail" && "Não foi possível copiar automaticamente. Selecione o texto acima e copie."}
+                <p role="status" aria-live="polite" className="mt-5 min-h-6 text-ink/90">
+                  {status === "opened" && (
+                    <>
+                      <strong className="text-abyss">O WhatsApp foi aberto em outra aba ou no aplicativo.</strong> Envie a
+                      mensagem por lá para a GRG receber o pedido. Se ele não abriu, use “Copiar mensagem” e cole na
+                      conversa com {siteConfig.name}.
+                    </>
+                  )}
+                  {status === "copied" && <strong className="text-abyss">Mensagem copiada. Agora é só colar no WhatsApp da GRG.</strong>}
+                  {status === "copy-fail" && "Não foi possível copiar automaticamente. Selecione o texto acima e copie."}
                 </p>
               </div>
             )}
