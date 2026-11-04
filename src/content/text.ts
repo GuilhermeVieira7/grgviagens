@@ -57,83 +57,125 @@ export const services: { key: ServiceKey; title: string; text: string }[] = [
   },
 ];
 
-export const steps = [
-  {
-    title: "Conte seus planos.",
-    text: "Informe o destino, as datas e como você gostaria de viajar.",
-  },
-  {
-    title: "Pesquisamos as possibilidades.",
-    text: "Nossa equipe consulta as opções disponíveis conforme suas preferências.",
-  },
-  {
-    title: "Receba sua cotação.",
-    text: "Apresentamos as alternativas, os valores e as condições da viagem.",
-  },
-  {
-    title: "Prepare-se para embarcar.",
-    text: "Após a confirmação da reserva, você recebe as informações e orientações necessárias para sua viagem.",
-  },
-];
-
-export const differentials = [
+/** Faixa logo após a abertura. */
+export const benefits = [
   {
     title: "Cotação personalizada",
-    text: "Cada pedido é analisado pela equipe, de acordo com o seu roteiro.",
+    text: "Cada pedido é montado conforme o seu roteiro, as datas e o orçamento.",
   },
   {
     title: "Atendimento próximo",
-    text: "Você conversa direto com quem está planejando a sua viagem.",
+    text: "Você conversa direto com quem está cuidando da sua viagem.",
   },
   {
-    title: "Check-in pela GRG",
-    text: "A agência realiza o check-in dos clientes e orienta sobre o embarque.",
+    title: "Check-in assistido",
+    text: "A GRG faz o check-in e orienta sobre o embarque, conforme as condições do voo.",
+  },
+];
+
+/** O trabalho da agência (seção "Você escolhe o destino…"). */
+export const agencyWork = [
+  {
+    title: "Entender a sua viagem",
+    text: "Origem, datas, quem vai e o que você espera do destino: começamos pelas suas preferências.",
   },
   {
-    title: "Orientação em cada escolha",
-    text: "Da hospedagem ao voo, ajudamos você a comparar e decidir.",
+    title: "Pesquisar voos e hospedagem",
+    text: "Consultamos as opções disponíveis para o seu roteiro, em vez de você comparar sozinho.",
+  },
+  {
+    title: "Apresentar valores e condições",
+    text: "Você recebe as alternativas encontradas, com valores e condições, para decidir com clareza.",
+  },
+  {
+    title: "Orientar reservas e embarque",
+    text: "Depois da confirmação, a GRG orienta sobre documentos, reservas e o dia do embarque.",
+  },
+];
+
+/** Serviços agrupados na página inicial (cada um aponta para a página existente). */
+export const serviceGroups: {
+  title: string;
+  text: string;
+  links: { label: string; href: string }[];
+}[] = [
+  {
+    title: "Passagens e hospedagens",
+    text: "Voos nacionais e internacionais e hotéis conforme o roteiro. Podem ser cotados juntos ou separados.",
+    links: [
+      { label: "Passagens aéreas", href: "/servicos/passagens-aereas" },
+      { label: "Hospedagem", href: "/servicos/hospedagem" },
+    ],
+  },
+  {
+    title: "Pacotes personalizados",
+    text: "Voo, hospedagem e o que mais fizer sentido, montados para o seu período e estilo de viagem.",
+    links: [{ label: "Pacotes de viagem", href: "/servicos/pacotes-de-viagem" }],
+  },
+  {
+    title: "Passeios e ingressos",
+    text: "Passeios e ingressos para atrações, solicitados junto com a viagem ou à parte.",
+    links: [{ label: "Passeios e ingressos", href: "/servicos/passeios-e-ingressos" }],
+  },
+  {
+    title: "Locação de veículos",
+    text: "Opções de carro no destino para quem prefere se deslocar por conta própria.",
+    links: [{ label: "Locação de veículos", href: "/servicos/aluguel-de-veiculos" }],
+  },
+  {
+    title: "Assessoria para passaporte",
+    text: "Orientação sobre as etapas e os documentos do pedido. A emissão do passaporte é feita pelo órgão oficial.",
+    links: [{ label: "Assessoria para passaporte", href: "/servicos/assessoria-para-passaporte" }],
+  },
+  {
+    title: "Check-in assistido",
+    text: "A GRG realiza o check-in dos clientes e orienta sobre o embarque, conforme as condições do voo.",
+    links: [{ label: "Check-in assistido", href: "/servicos/check-in-assistido" }],
+  },
+];
+
+export const steps = [
+  {
+    title: "Conte seus planos.",
+    text: "Informe origem, destino e período desejado.",
+  },
+  {
+    title: "Receba uma proposta.",
+    text: "Compare as opções, os valores e as condições apresentados pela GRG.",
+  },
+  {
+    title: "Confirme sua viagem.",
+    text: "Após a confirmação da reserva, receba os documentos e as orientações para embarcar.",
   },
 ];
 
 export const faq = [
   {
-    q: "Preciso saber o destino para pedir uma cotação?",
-    a: "Não. Se você ainda não escolheu, é só marcar “Ainda não escolhi o destino” e contar o tipo de viagem e as suas preferências. A gente ajuda a encontrar o lugar.",
+    q: "Posso comprar somente passagem ou hospedagem?",
+    a: "Sim. Passagens aéreas e hospedagem podem ser cotadas separadamente ou juntas, assim como passeios, ingressos e locação de veículos.",
   },
   {
-    q: "Vocês fazem o check-in?",
+    q: "Preciso ter destino e datas definidos?",
+    a: "Não. No formulário você pode marcar “Ainda não escolhi o destino” ou “Ainda não defini as datas” e contar o período aproximado e o tipo de viagem que imagina. A equipe ajuda a definir.",
+  },
+  {
+    q: "Como recebo a cotação?",
+    a: "O pedido segue pelo WhatsApp oficial da GRG. Você revisa a mensagem antes de enviar e, pela conversa, a equipe apresenta as opções encontradas com valores e condições.",
+  },
+  {
+    q: "Como consulto as formas de pagamento?",
+    a: "As formas de pagamento dependem da viagem e das condições disponíveis no momento. Elas são informadas pelo atendimento, junto com a proposta.",
+  },
+  {
+    q: "A GRG realiza meu check-in?",
     a: "Sim. A GRG realiza o check-in dos clientes e orienta sobre o embarque, conforme as condições do voo.",
   },
   {
-    q: "Posso solicitar apenas hospedagem ou passagem?",
-    a: "Sim. Passagens e hospedagem fazem parte do atendimento da GRG e podem ser solicitadas separadamente.",
-  },
-  {
-    q: "Como consulto valores e formas de pagamento?",
-    a: "Pelo atendimento, conforme a viagem e as condições disponíveis. Conte seus planos no formulário e a GRG responde com as opções.",
-  },
-  {
-    q: "O que a GRG Viagens oferece?",
-    a: "A GRG é uma agência de viagens com atendimento próximo. Trabalha com passagens aéreas, hospedagem, pacotes personalizados, passeios, ingressos, aluguel de veículos, assessoria para passaporte e check-in assistido.",
-  },
-  {
-    q: "Como funciona a cotação de pacotes de viagem?",
-    a: "Você conta o destino, as datas e o seu estilo de viagem no planejador. A equipe pesquisa as possibilidades, apresenta as opções com valores e condições e, depois da confirmação, orienta você para o embarque.",
-  },
-  {
-    q: "A GRG ajuda a planejar viagem em família, com crianças?",
-    a: "Sim. No planejador você informa quantos adultos e crianças vão, com a idade de cada criança, e a equipe considera isso ao preparar a cotação.",
-  },
-  {
-    q: "Vocês fazem reserva de hotel e pedem passeios e ingressos?",
-    a: "Sim. Hospedagem, passeios e ingressos fazem parte do atendimento e podem ser pedidos junto com a viagem ou separadamente.",
-  },
-  {
-    q: "A GRG faz aluguel de carro?",
-    a: "Sim. O aluguel de veículos faz parte do atendimento e pode ser solicitado junto com passagens e hospedagem.",
+    q: "Como são informadas as condições de alteração e cancelamento?",
+    a: "Elas variam conforme a tarifa, a companhia aérea, o hotel e os demais fornecedores de cada viagem. Por isso fazem parte das informações da proposta: confira com o atendimento antes de confirmar a reserva.",
   },
   {
     q: "A GRG emite passaporte?",
-    a: "A agência oferece assessoria no processo de emissão. A emissão do documento é responsabilidade do órgão competente.",
+    a: "Não. A agência oferece assessoria no processo; a emissão do documento é responsabilidade do órgão oficial competente.",
   },
 ];

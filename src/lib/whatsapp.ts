@@ -1,13 +1,26 @@
 import { siteConfig } from "@/config/site";
+import type { SelectionContext } from "@/content/offers";
 
-export type Interest = "passagem" | "hospedagem" | "pacote" | "indefinido" | "";
+export type ServiceChoice =
+  | "passagem"
+  | "hospedagem"
+  | "pacote"
+  | "passeios"
+  | "veiculo"
+  | "passaporte"
+  | "indefinido";
 
-export const interestLabels: Record<Exclude<Interest, "">, string> = {
-  passagem: "Passagem",
+export const serviceChoiceLabels: Record<ServiceChoice, string> = {
+  passagem: "Passagem aérea",
   hospedagem: "Hospedagem",
   pacote: "Pacote completo",
+  passeios: "Passeios e ingressos",
+  veiculo: "Locação de veículo",
+  passaporte: "Assessoria para passaporte",
   indefinido: "Ainda não sei",
 };
+
+export type BudgetBasis = "total" | "pessoa";
 
 export type TripRequest = {
   name: string;
@@ -22,9 +35,13 @@ export type TripRequest = {
   adults: number;
   children: number;
   childAges: string[]; // "0".."17" ou ""
-  interest: Interest;
+  services: ServiceChoice[];
   budget: string;
+  budgetBasis: BudgetBasis;
+  lodging: string;
   notes: string;
+  /** Oferta ou destino escolhido na vitrine, se houver. */
+  selection?: SelectionContext | null;
 };
 
 export type FieldErrors = Partial<
@@ -111,6 +128,8 @@ function ageLabel(a: string): string {
 
 export function buildMessage(r: TripRequest): string {
   const destino = r.undecidedDestination ? "Ainda não escolhi o destino" : r.destination.trim();
+  // O contexto da vitrine só vale enquanto o destino escolhido não for trocado.
+  const sel = r.selection && !r.undecidedDestination && r.selection.destination === r.destination.trim() ? r.selection : null;
 
   let periodo: string;
   if (r.undecidedDates) {
@@ -132,7 +151,9 @@ export function buildMessage(r: TripRequest): string {
     .join(" e ");
 
   const lines = [
-    "Olá, GRG! Quero planejar uma viagem.",
+    sel?.isOffer
+      ? `Olá, GRG! Tenho interesse no pacote para ${sel.destination} divulgado no site.`
+      : "Olá, GRG! Quero planejar uma viagem.",
     "",
     `Nome: ${r.name.trim()}`,
     `Saída: ${r.origin.trim()}`,
@@ -145,11 +166,25 @@ export function buildMessage(r: TripRequest): string {
       `Idades das crianças: ${r.childAges.slice(0, r.children).map(ageLabel).join(", ")}`,
     );
   }
-  if (r.interest) lines.push(`Quero cotar: ${interestLabels[r.interest]}`);
-  if (r.budget.trim()) lines.push(`Orçamento aproximado: ${r.budget.trim()}`);
-  if (r.notes.trim()) lines.push(`Observações: ${r.notes.trim()}`);
+  if (sel?.isOffer && sel.details.length) {
+    lines.push("", `Pacote de interesse (ref. ${sel.id}):`, ...sel.details.map((d) => `- ${d}`));
+  }
+  const extras: string[] = [];
+  if (r.services.length) extras.push(`Quero cotar: ${r.services.map((k) => serviceChoiceLabels[k]).join(", ")}`);
+  if (r.budget.trim()) {
+    extras.push(`Orçamento aproximado: ${r.budget.trim()} (${r.budgetBasis === "pessoa" ? "por pessoa" : "total da viagem"})`);
+  }
+  if (r.lodging.trim()) extras.push(`Hospedagem: ${r.lodging.trim()}`);
+  if (r.notes.trim()) extras.push(`Observações: ${r.notes.trim()}`);
+  if (extras.length) lines.push("", ...extras);
 
   return lines.join("\n");
+}
+
+/** Número oficial (só dígitos) válido, ou null. */
+export function whatsappDigits(): string | null {
+  const digits = siteConfig.whatsappNumber.replace(/\D/g, "");
+  return /^55\d{10,11}$/.test(digits) ? digits : null;
 }
 
 /** Link do WhatsApp, ou null enquanto o número não estiver configurado. */

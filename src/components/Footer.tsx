@@ -1,17 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { footerLinks, siteConfig } from "@/config/site";
-import { photoLabels } from "@/content/places";
+import { showcase } from "@/content/offers";
+import { destinations, photoLabels } from "@/content/places";
 import { photos, type PhotoKey } from "@/content/photos";
 import { guides } from "@/content/guides";
+import { formatPhone } from "@/lib/format";
 import { Year } from "./Year";
 
-const creditKeys = Object.keys(photos) as PhotoKey[];
-
-function formatPhone(n: string) {
-  const d = n.replace(/\D/g, "").replace(/^55/, "");
-  return d.length === 11 ? `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}` : d;
-}
+/** Créditos só das fotos publicadas: abertura, vitrine e páginas de destino. */
+const creditKeys = Array.from(
+  new Set<PhotoKey>(["hero-noronha", ...showcase.map((s) => s.photo), ...destinations.map((d) => d.photo)]),
+);
 
 export function Footer() {
   const wa = siteConfig.whatsappContactUrl;
@@ -47,13 +47,27 @@ export function Footer() {
               </li>
             )}
           </ul>
-          {siteConfig.cadastur && (
-            <p className="mt-4 text-sm text-white/75">
-              Cadastur nº {siteConfig.cadastur}.{" "}
-              <a href="https://cadastur.turismo.gov.br" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-lagoon">
-                Consultar cadastro
-              </a>
-            </p>
+          {(siteConfig.cnpj || siteConfig.cadastur || siteConfig.legalName) && (
+            <dl className="mt-6 grid max-w-[24rem] gap-1.5 border-t border-white/15 pt-5 text-sm text-white/70">
+              {siteConfig.legalName && (
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-semibold text-white/85">Razão social</dt>
+                  <dd>{siteConfig.legalName}</dd>
+                </div>
+              )}
+              {siteConfig.cnpj && (
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-semibold text-white/85">CNPJ</dt>
+                  <dd>{siteConfig.cnpj}</dd>
+                </div>
+              )}
+              {siteConfig.cadastur && (
+                <div className="flex flex-wrap gap-x-2">
+                  <dt className="font-semibold text-white/85">Cadastur</dt>
+                  <dd>{siteConfig.cadastur}</dd>
+                </div>
+              )}
+            </dl>
           )}
         </div>
 
@@ -92,8 +106,8 @@ export function Footer() {
             <span className="text-sm text-white/60 group-open:hidden">(ver lista)</span>
           </summary>
           <p className="mt-3 max-w-[46rem] text-sm text-white/70">
-            Fotografias reais de cada destino, publicadas sob licenças Creative Commons ou em
-            domínio público, via Wikimedia Commons.
+            Fotografias reais dos destinos, publicadas sob licenças Creative Commons ou em
+            domínio público, via Wikimedia Commons. As imagens não mostram clientes nem a equipe da GRG.
           </p>
           <ul className="mt-4 grid gap-x-8 gap-y-2 text-sm leading-relaxed text-white/75 sm:grid-cols-2 lg:grid-cols-3">
             {creditKeys.map((k) => {

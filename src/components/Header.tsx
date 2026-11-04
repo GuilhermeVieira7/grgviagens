@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { navLinks } from "@/config/site";
+import { navLinks, siteConfig } from "@/config/site";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -77,7 +78,7 @@ export function Header() {
     <>
       <header
         className={`on-dark fixed inset-x-0 top-0 z-40 h-[var(--header-h)] text-white transition-[background-color,box-shadow] duration-300 ${
-          scrolled || pathname !== "/" ? "bg-abyss shadow-[0_6px_24px_rgb(2_12_40/0.35)]" : "bg-transparent"
+          scrolled || pathname !== "/" ? "bg-abyss shadow-[0_1px_0_rgb(255_255_255/0.08)]" : "header-over-photo"
         }`}
       >
         <div className="wrap-wide flex h-full items-center justify-between">
@@ -92,7 +93,7 @@ export function Header() {
             />
           </Link>
 
-          <nav aria-label="Principal" className="hidden items-center gap-9 lg:flex">
+          <nav aria-label="Principal" className="hidden items-center gap-7 lg:flex xl:gap-9">
             {navLinks.map((l) => (
               <Link prefetch={false}
                 key={l.href}
@@ -102,6 +103,17 @@ export function Header() {
                 {l.label}
               </Link>
             ))}
+            <a
+              href={siteConfig.whatsappContactUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="whatsapp_contato"
+              data-track-local="cabecalho"
+              className="inline-flex min-h-11 items-center gap-2 border-l border-white/25 pl-7 text-base font-semibold text-white hover:text-lagoon"
+            >
+              <WhatsAppIcon className="h-5 w-5" />
+              WhatsApp
+            </a>
             <Link prefetch={false} href="/#planejador" data-track="header_planejar" className="btn btn-lagoon !min-h-11 !px-5 !py-2">
               Planejar minha viagem
             </Link>
@@ -162,10 +174,21 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="wrap-wide flex-none pb-[max(2rem,env(safe-area-inset-bottom))]">
-            <Link prefetch={false} href="/#planejador" onClick={() => closeMenu(false)} className="btn btn-lagoon w-full">
+          <div className="wrap-wide grid flex-none gap-3 pb-[max(2rem,env(safe-area-inset-bottom))]">
+            <Link prefetch={false} href="/#planejador" onClick={() => closeMenu(false)} data-track="header_planejar" className="btn btn-lagoon w-full">
               Planejar minha viagem
             </Link>
+            <a
+              href={siteConfig.whatsappContactUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="whatsapp_contato"
+              data-track-local="menu"
+              className="btn btn-outline-light w-full"
+            >
+              <WhatsAppIcon className="h-5 w-5" />
+              Conversar no WhatsApp
+            </a>
           </div>
         </div>
       )}

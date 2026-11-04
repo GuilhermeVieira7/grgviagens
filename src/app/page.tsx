@@ -1,35 +1,36 @@
 import type { Metadata } from "next";
-import { About } from "@/components/About";
+import { Benefits } from "@/components/Benefits";
 import { Closing } from "@/components/Closing";
-import { Destinations } from "@/components/Destinations";
 import { Faq } from "@/components/Faq";
-import { Gallery } from "@/components/Gallery";
 import { Hero } from "@/components/Hero";
-import { JsonLd } from "@/components/JsonLd";
 import { HowItWorks } from "@/components/HowItWorks";
-import { InstagramStrip } from "@/components/InstagramStrip";
+import { JsonLd } from "@/components/JsonLd";
+import { Offers } from "@/components/Offers";
 import { Planner } from "@/components/Planner";
 import { Services } from "@/components/Services";
 import { Testimonials } from "@/components/Testimonials";
-import { Tips } from "@/components/Tips";
+import { WhyGrg } from "@/components/WhyGrg";
 import { faq } from "@/content/text";
 import { faqLd } from "@/lib/seo";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
+/**
+ * Página inicial, na ordem de decisão: abertura → benefícios → vitrine →
+ * por que a GRG → cotação → serviços → como funciona → dúvidas → chamada final.
+ * Depoimentos só aparecem quando houver depoimentos reais em content/testimonials.ts.
+ */
 export default function Home() {
   return (
     <main id="conteudo">
       <Hero />
-      <Destinations />
-      <Services />
-      <Gallery />
-      <Planner />
-      <HowItWorks />
-      <InstagramStrip />
-      <About />
+      <Benefits />
+      <Offers />
+      <WhyGrg />
       <Testimonials />
-      <Tips />
+      <Planner />
+      <Services />
+      <HowItWorks />
       <Faq />
       <Closing />
       <JsonLd data={faqLd(faq)} />

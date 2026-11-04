@@ -21,6 +21,9 @@ export function agencyLd() {
       "Agência de viagens e turismo: passagens aéreas, hotéis e hospedagem, pacotes de viagem, passeios, ingressos, aluguel de veículos, assessoria para passaporte e check-in assistido. Viagens nacionais e internacionais, viagem em família, lua de mel e primeira viagem.",
     telephone: `+${siteConfig.whatsappNumber}`,
     sameAs: [siteConfig.instagramUrl],
+    ...(siteConfig.cnpj ? { taxID: siteConfig.cnpj } : {}),
+    ...(siteConfig.legalName ? { legalName: siteConfig.legalName } : {}),
+    ...(siteConfig.email ? { email: siteConfig.email } : {}),
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
